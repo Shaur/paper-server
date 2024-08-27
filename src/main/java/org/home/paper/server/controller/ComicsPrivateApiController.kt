@@ -4,6 +4,7 @@ import org.apache.coyote.BadRequestException
 import org.home.paper.server.archive.ArchiveToolFactory
 import org.home.paper.server.model.PurgatoryItem
 import org.home.paper.server.service.PurgatoryService
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
@@ -21,8 +22,8 @@ class ComicsPrivateApiController(
         purgatoryDir.mkdirs()
     }
 
-    @PostMapping
-    fun upload(@RequestParam("file") file: MultipartFile): PurgatoryItem {
+    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun upload(@RequestPart file: MultipartFile): PurgatoryItem {
         val name = file.originalFilename ?: throw BadRequestException("File name is null")
 
         val destFile = purgatoryDir.resolve(name)
