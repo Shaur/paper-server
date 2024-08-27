@@ -1,0 +1,8 @@
+services:
+  paper-postgres:
+    image: postgres:16.4-alpine
+    container_name: paper-postgres
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
