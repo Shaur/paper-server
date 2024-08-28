@@ -47,8 +47,7 @@ class CbzTool(fileName: String) : ArchiveTool(fileName) {
         return ArchiveMeta(
             seriesName = seriesName,
             number = number,
-            pagesCount = descriptors.count(),
-            fileName = fileName
+            pagesCount = descriptors.count()
         )
     }
 

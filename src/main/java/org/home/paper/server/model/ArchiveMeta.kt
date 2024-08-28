@@ -5,6 +5,5 @@ data class ArchiveMeta(
     val number: String,
     val summary: String = "",
     val publisher: String = "",
-    val pagesCount: Int = 0,
-    val fileName: String
+    val pagesCount: Int = 0
 )

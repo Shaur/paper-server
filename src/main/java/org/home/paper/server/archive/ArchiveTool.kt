@@ -61,8 +61,7 @@ abstract class ArchiveTool(protected val fileName: String) {
             publisher = publisherExpr.evaluate(document, XPathConstants.STRING) as String,
             summary = summaryExpr.evaluate(document, XPathConstants.STRING) as String,
             number = extractFirstNumber(number),
-            pagesCount = 0,
-            fileName = fileName
+            pagesCount = 0
         )
     }
 

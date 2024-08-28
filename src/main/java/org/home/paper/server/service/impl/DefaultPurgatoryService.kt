@@ -30,6 +30,6 @@ class DefaultPurgatoryService(
         val item = repository.get(id) ?: throw FileNotFoundException("File by id $id not found")
 
         repository.delete(id)
-        purgatoryDir.resolve(item.meta.fileName).delete()
+        purgatoryDir.resolve(item.id.toString()).deleteRecursively()
     }
 }
