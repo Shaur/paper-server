@@ -1,21 +1,22 @@
 package org.home.paper.server.dto
 
+import java.util.*
+
 data class ApproveRequest(
+    val id: Long,
     val seriesUpdate: SeriesUpdateRequest,
-    val issueUpdate: IssueUpdateRequest,
-    val fileName: String
+    val issueUpdate: IssueUpdateRequest
 )
 
 data class SeriesUpdateRequest(
     val id: Long? = null,
     val title: String,
-    val publisher: String,
-    val startDateTime: Long,
-    val endDateTime: Long? = null
+    val publisher: String
 )
 
 data class IssueUpdateRequest(
-    val number: String? = null,
+    val number: String,
     val summary: String? = null,
+    val publicationDate: Date,
     val pagesCount: Int
 )

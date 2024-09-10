@@ -1,9 +1,13 @@
 package org.home.paper.server.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.apache.coyote.BadRequestException
 import org.home.paper.server.archive.ArchiveToolFactory
+import org.home.paper.server.dto.ApproveRequest
 import org.home.paper.server.model.PurgatoryItem
 import org.home.paper.server.service.PurgatoryService
+import org.slf4j.LoggerFactory
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.http.ContentDisposition
@@ -14,6 +18,8 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
@@ -25,10 +31,11 @@ import java.nio.file.StandardCopyOption
 @RestController
 @RequestMapping("/private/comics")
 class ComicsPrivateApiController(
-    private val purgatoryService: PurgatoryService
+    private val purgatoryService: PurgatoryService,
 ) {
 
     private val purgatoryDir = File("purgatory")
+    private val log = LoggerFactory.getLogger(ComicsPrivateApiController::class.java)
 
     init {
         purgatoryDir.mkdirs()
@@ -58,6 +65,11 @@ class ComicsPrivateApiController(
     @GetMapping("/purgatory")
     fun getPurgatory(): List<PurgatoryItem> {
         return purgatoryService.getAll()
+    }
+
+    @PutMapping("/purgatory")
+    fun approvePurgatoryItem(@RequestBody request: ApproveRequest) {
+        purgatoryService.approve(request)
     }
 
     @GetMapping("/purgatory/file/{id}/{number}")

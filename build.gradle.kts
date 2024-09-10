@@ -42,11 +42,13 @@ dependencies {
 
     implementation("com.github.junrar:junrar:7.5.5")
 
+    implementation(kotlin("stdlib-jdk8"))
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:postgresql:1.20.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<Test> {
