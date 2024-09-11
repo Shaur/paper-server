@@ -9,4 +9,6 @@ interface SeriesRepository {
     fun get(id: Long): Series
 
     fun update(series: Series): Series
+
+    fun findAll(titlePart: String): List<Series>
 }

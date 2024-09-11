@@ -27,4 +27,11 @@ class DefaultSeriesRepository(
     override fun update(series: Series): Series {
         return manager.merge(series)
     }
+
+
+    override fun findAll(titlePart: String): List<Series> {
+        return manager.createQuery("from series s where s.title like :pattern", Series::class.java)
+            .setParameter("pattern", "%$titlePart%")
+            .resultList
+    }
 }
