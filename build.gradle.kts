@@ -5,6 +5,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.jpa") version "2.0.20"
     id("io.spring.dependency-management") version "1.1.6"
     id("org.flywaydb.flyway") version "10.17.1"
+    id("org.jetbrains.kotlin.plugin.noarg") version "2.0.20"
+
     kotlin("jvm")
 }
 

@@ -11,6 +11,18 @@ class DefaultSeriesService(
 ) : SeriesService {
 
     override fun findAll(titlePart: String): List<SeriesSearchView> {
-        return repository.findAll(titlePart).map { SeriesSearchView(it.id!!, it.title) }
+        return repository.findAll(titlePart)
+            .map {
+                val title = if (it.minYear == it.maxYear) {
+                    "${it.title} (${it.minYear})"
+                } else {
+                    "${it.title} (${it.minYear} - ${it.maxYear})"
+                }
+
+                SeriesSearchView(
+                    id = it.id,
+                    title = title
+                )
+            }
     }
 }
