@@ -49,7 +49,7 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.testcontainers:postgresql:1.20.0")
+    testImplementation("org.testcontainers:postgresql:1.20.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

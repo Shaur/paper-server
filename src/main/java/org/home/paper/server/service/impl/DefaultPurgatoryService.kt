@@ -10,20 +10,16 @@ import org.home.paper.server.repository.IssueRepository
 import org.home.paper.server.repository.PurgatoryRepository
 import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.service.PurgatoryService
+import org.home.paper.server.service.StorageService
 import org.springframework.stereotype.Service
-import java.io.File
-import java.io.FileNotFoundException
 
 @Service
 class DefaultPurgatoryService(
     private val purgatoryRepository: PurgatoryRepository,
     private val issueRepository: IssueRepository,
-    private val seriesRepository: SeriesRepository
+    private val seriesRepository: SeriesRepository,
+    private val storageService: StorageService
 ) : PurgatoryService {
-
-    private val purgatoryDir = File("purgatory")
-
-    private val issuesDir = File("issues")
 
     override fun insert(meta: ArchiveMeta): PurgatoryItem {
         val item = PurgatoryItem(meta = meta)
@@ -36,10 +32,8 @@ class DefaultPurgatoryService(
 
     @Transactional
     override fun delete(id: Long) {
-        val item = purgatoryRepository.get(id) ?: throw FileNotFoundException("File by id $id not found")
-
         purgatoryRepository.delete(id)
-        purgatoryDir.resolve(item.id.toString()).deleteRecursively()
+        storageService.deletePurgatoryDir(id)
     }
 
     @Transactional
@@ -65,7 +59,8 @@ class DefaultPurgatoryService(
         )
 
         val savedIssue = issueRepository.create(issue)
-        purgatoryDir.resolve(purgatoryId.toString()).copyRecursively(issuesDir.resolve(savedIssue.id.toString()), true)
+
+        storageService.transfer(purgatoryId, savedIssue.id!!)
 
         purgatoryRepository.delete(purgatoryId)
     }
