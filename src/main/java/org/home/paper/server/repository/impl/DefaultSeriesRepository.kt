@@ -2,7 +2,6 @@ package org.home.paper.server.repository.impl
 
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
-import org.home.paper.server.dto.SeriesSearchView
 import org.home.paper.server.model.Series
 import org.home.paper.server.model.projection.SeriesSearchViewProjection
 import org.home.paper.server.repository.SeriesRepository
@@ -30,7 +29,7 @@ class DefaultSeriesRepository(
         return manager.merge(series)
     }
 
-    override fun findAll(titlePart: String): List<SeriesSearchViewProjection> {
+    override fun findAll(titlePart: String?, limit: Int, offset: Int): List<SeriesSearchViewProjection> {
         val hql = """
             select new SeriesSearchViewProjection(
                 s.id, 
@@ -39,14 +38,15 @@ class DefaultSeriesRepository(
                 max(EXTRACT(YEAR FROM i.publicationDate))
             ) 
             from series s
-                join s.issues i
+                left join issue i on i.seriesId = s.id
                 where s.title like :pattern
             group by s.id, s.title
         """.trimIndent()
 
         return manager.createQuery(hql, SeriesSearchViewProjection::class.java)
-            .setParameter("pattern", "%$titlePart%")
+            .setParameter("pattern", "%${titlePart ?: ""}%")
+            .setFirstResult(offset)
+            .setMaxResults(limit)
             .resultList
-
     }
 }

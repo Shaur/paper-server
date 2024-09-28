@@ -53,7 +53,7 @@ class DefaultPurgatoryService(
         val issue = Issue(
             number = issueUpdate.number,
             summary = issueUpdate.summary ?: "",
-            series = series,
+            seriesId = series.id!!,
             pagesCount = issueUpdate.pagesCount,
             publicationDate = issueUpdate.publicationDate
         )

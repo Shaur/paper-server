@@ -4,6 +4,9 @@ import org.home.paper.server.configuration.properties.StorageProperties
 import org.home.paper.server.service.StorageService
 import org.springframework.stereotype.Service
 import java.io.File
+import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 @Service
 class DefaultStorageService(properties: StorageProperties) : StorageService {
@@ -23,6 +26,21 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
     override fun transfer(purgatoryId: Long, issueId: Long) {
         purgatoryDir.resolve(purgatoryId.toString())
             .copyRecursively(issuesDir.resolve(issueId.toString()), true)
+    }
+
+    override fun storePurgatoryArchive(source: InputStream, name: String): File {
+        val dest = purgatoryDir.resolve(name)
+        Files.copy(source, dest.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        return dest
+    }
+
+    override fun resolvePurgatoryDir(id: Long): File = purgatoryDir.resolve(id.toString())
+
+    override val purgatory: StorageService.Purgatory = object : StorageService.Purgatory {
+        override operator fun get(id: Long, number: Int): File {
+            return purgatoryDir.resolve(id.toString()).listFiles()[number]
+        }
+
     }
 
 }

@@ -11,13 +11,6 @@ data class Series(
 
     val title: String,
 
-    @OneToMany(
-        fetch = FetchType.LAZY,
-        cascade = [CascadeType.ALL],
-        mappedBy = "id"
-    )
-    val issues: List<Issue> = listOf(),
-
     val publisher: String,
 
     val isEnded: Boolean = false

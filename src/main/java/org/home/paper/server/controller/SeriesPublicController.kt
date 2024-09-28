@@ -13,9 +13,13 @@ class SeriesPublicController(
     private val service: SeriesService
 ) {
 
-    @GetMapping("/find")
-    fun findAll(@RequestParam("title") titlePart: String): List<SeriesSearchView> {
-        return service.findAll(titlePart)
+    @GetMapping
+    fun findAll(
+        @RequestParam("title", required = false) titlePart: String?,
+        @RequestParam("limit", required = false) limit: Int = 10,
+        @RequestParam("offset", required = false) offset: Int = 0
+    ): List<SeriesSearchView> {
+        return service.findAll(titlePart, limit, offset)
     }
 
 }

@@ -13,9 +13,7 @@ data class Issue(
 
     val summary: String = "",
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "series_id")
-    val series: Series,
+    val seriesId: Long,
 
     val pagesCount: Int,
 

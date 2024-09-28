@@ -1,13 +1,11 @@
 package org.home.paper.server.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.apache.coyote.BadRequestException
 import org.home.paper.server.archive.ArchiveToolFactory
 import org.home.paper.server.dto.ApproveRequest
 import org.home.paper.server.model.PurgatoryItem
 import org.home.paper.server.service.PurgatoryService
-import org.slf4j.LoggerFactory
+import org.home.paper.server.service.StorageService
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.http.ContentDisposition
@@ -24,22 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 @RestController
 @RequestMapping("/private/comics")
 class ComicsPrivateApiController(
     private val purgatoryService: PurgatoryService,
+    private val storageService: StorageService
 ) {
-
-    private val purgatoryDir = File("purgatory")
-    private val log = LoggerFactory.getLogger(ComicsPrivateApiController::class.java)
-
-    init {
-        purgatoryDir.mkdirs()
-    }
 
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun upload(@RequestPart file: List<MultipartFile>): List<PurgatoryItem> {
@@ -49,15 +38,14 @@ class ComicsPrivateApiController(
     private fun upload(file: MultipartFile): PurgatoryItem {
         val name = file.originalFilename ?: throw BadRequestException("File name is null")
 
-        val destFile = purgatoryDir.resolve(name)
-        Files.copy(file.inputStream, destFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+        val archive = storageService.storePurgatoryArchive(file.inputStream, name)
 
         val tool = ArchiveToolFactory(name).create()
-        val meta = tool.getMeta(destFile.inputStream())
+        val meta = tool.getMeta(archive.inputStream())
         val uploadedMeta = purgatoryService.insert(meta)
 
-        tool.extract(destFile.inputStream(), purgatoryDir.resolve(uploadedMeta.id.toString()))
-        destFile.delete()
+        tool.extract(archive.inputStream(), storageService.resolvePurgatoryDir(uploadedMeta.id!!))
+        archive.delete()
 
         return uploadedMeta
     }
@@ -74,7 +62,7 @@ class ComicsPrivateApiController(
 
     @GetMapping("/purgatory/file/{id}/{number}")
     fun getFile(@PathVariable id: Long, @PathVariable number: Int): ResponseEntity<Resource> {
-        val file = purgatoryDir.resolve(id).listFiles()[number]
+        val file = storageService.purgatory[id, number]
         val contentDisposition = ContentDisposition.builder("attachment")
             .filename("$number.jpeg")
             .build()
@@ -90,8 +78,4 @@ class ComicsPrivateApiController(
 
     @DeleteMapping("/purgatory/{id}")
     fun deletePurgatoryItem(@PathVariable id: Long) = purgatoryService.delete(id)
-
-    private fun File.resolve(name: Long): File {
-        return this.resolve(name.toString())
-    }
 }
