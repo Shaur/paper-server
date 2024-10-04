@@ -40,6 +40,12 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
         override operator fun get(id: Long, number: Int): File {
             return purgatoryDir.resolve(id.toString()).listFiles()[number]
         }
+    }
+
+    override val page: StorageService.Page = object : StorageService.Page {
+        override fun get(id: Long, number: Int): File {
+            return issuesDir.resolve(id.toString()).listFiles()[number]
+        }
 
     }
 

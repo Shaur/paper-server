@@ -2,6 +2,7 @@ package org.home.paper.server.service.impl
 
 import jakarta.transaction.Transactional
 import org.home.paper.server.dto.ApproveRequest
+import org.home.paper.server.exceptions.ObjectNotFoundException
 import org.home.paper.server.model.ArchiveMeta
 import org.home.paper.server.model.Issue
 import org.home.paper.server.model.PurgatoryItem
@@ -12,6 +13,7 @@ import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.service.PurgatoryService
 import org.home.paper.server.service.StorageService
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrElse
 
 @Service
 class DefaultPurgatoryService(
@@ -40,14 +42,17 @@ class DefaultPurgatoryService(
     override fun approve(request: ApproveRequest) {
         val (purgatoryId, seriesUpdate, issueUpdate) = request
         val series = if (seriesUpdate.id == null) {
-            seriesRepository.create(
+            seriesRepository.save(
                 Series(
                     title = seriesUpdate.title,
                     publisher = seriesUpdate.publisher
                 )
             )
         } else {
-            seriesRepository.get(seriesUpdate.id)
+            seriesRepository.findById(seriesUpdate.id)
+                .getOrElse {
+                    throw ObjectNotFoundException("Series", seriesUpdate.id)
+                }
         }
 
         val issue = Issue(

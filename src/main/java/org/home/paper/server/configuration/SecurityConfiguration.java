@@ -46,7 +46,7 @@ public class SecurityConfiguration {
                 }))
                 .authorizeHttpRequests((requests) ->
                         requests
-                                .requestMatchers("/", "/customer/login", "/customer/register", "/private/comics/purgatory/file/**").permitAll()
+                                .requestMatchers("/", "/customer/login", "/customer/register", "/private/comics/purgatory/file/**", "/pages/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

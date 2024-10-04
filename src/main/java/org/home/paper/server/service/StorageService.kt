@@ -15,7 +15,13 @@ interface StorageService {
 
     val purgatory: Purgatory
 
+    val page: Page
+
     interface Purgatory {
+        operator fun get(id: Long, number: Int): File
+    }
+
+    interface Page {
         operator fun get(id: Long, number: Int): File
     }
 }
