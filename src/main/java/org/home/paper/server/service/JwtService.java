@@ -2,7 +2,6 @@ package org.home.paper.server.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.home.paper.server.model.User;
@@ -11,8 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.security.AuthProvider;
-import java.security.Provider;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;

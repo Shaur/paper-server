@@ -15,4 +15,10 @@ class DefaultIssueRepository(
     override fun create(issue: Issue): Issue {
         return entityManager.merge(issue)
     }
+
+    override fun getBySeriesId(seriesId: Long): List<Issue> {
+        return entityManager.createQuery("select i from issue i where i.seriesId = :seriesId", Issue::class.java)
+            .setParameter("seriesId", seriesId)
+            .resultList
+    }
 }
