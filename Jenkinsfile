@@ -4,7 +4,7 @@ pipeline {
     skipStagesAfterUnstable()
     skipDefaultCheckout()
   }
-  environment { ... }
+  environment {  }
   stages {
     stage("Prepare container") {
       agent {
