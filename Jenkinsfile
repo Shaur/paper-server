@@ -1,20 +1,18 @@
 pipeline {
-  agent any
+  agent {
+      label "kubeagent"
+  }
   options {
     skipStagesAfterUnstable()
     skipDefaultCheckout()
   }
   stages {
     stage("Prepare container") {
-      agent {
-        docker {
-          image 'openjdk:24-jdk-slim'
-        }
-      }
       stages {
         stage('Build') {
         steps {
             checkout scm
+            sh 'chmod +x gradlew'
             sh './gradlew build'
          }
         }
