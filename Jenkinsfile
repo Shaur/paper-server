@@ -18,9 +18,9 @@ pipeline {
         }
         stage('Docker build') {
             steps {
-                docker build -t paper-service .
-                docker tag paper-service paper.webhop.me/paper-service:latest
-                docker push paper.webhop.me/paper-service:latest
+                sh 'docker build -t paper-service .'
+                sh 'docker tag paper-service paper.webhop.me/paper-service:latest'
+                sh 'docker push paper.webhop.me/paper-service:latest'
             }
         }
       }
