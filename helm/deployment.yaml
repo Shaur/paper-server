@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paper-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paper-service
+  template:
+    metadata:
+      labels:
+        app: paper-service
+    spec:
+      containers:
+        - name: paper-service
+          image: paper-service:1.0.0
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: paper-service-config

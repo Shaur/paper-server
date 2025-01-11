@@ -23,6 +23,13 @@ pipeline {
                 sh 'docker push paper.webhop.me/paper-service:latest'
             }
         }
+        stage('Helm deploy') {
+            steps {
+                withKubeConfig([credentialsId: 'kubernetes-creds', serverUrl: "https://192.268.3.229:16443", namespace: "default"]) {
+                    sh 'helm --help'
+                }
+            }
+        }
       }
     }
   }
