@@ -19,8 +19,8 @@ pipeline {
         stage('Docker build') {
             steps {
                 sh 'docker build -t paper-service .'
-                sh 'docker tag paper-service paper.webhop.me/paper-service:latest'
-                sh 'docker push paper.webhop.me/paper-service:latest'
+                sh "docker tag ${DOCKER_REGISTRY}/paper-service:latest"
+                sh "docker push ${DOCKER_REGISTRY}/paper-service:latest"
             }
         }
         stage('Helm deploy') {
