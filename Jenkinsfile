@@ -25,8 +25,8 @@ pipeline {
         }
         stage('Helm deploy') {
             steps {
-                withKubeConfig([credentialsId: 'kubernetes-creds', serverUrl: "${CLUSTER_URL}", namespace: "default"]) {
-                    sh 'helm upgrade paper-service paper-chart'
+                withKubeConfig([serverUrl: "${CLUSTER_URL}", namespace: "default"]) {
+                    sh 'helm upgrade --install paper-service paper-chart'
                 }
             }
         }
