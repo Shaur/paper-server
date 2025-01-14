@@ -65,10 +65,8 @@ ingress:
 resources: {}
 
 livenessProbe:
-  httpGet:
-    path: /
-    port: http
+  port: http
 readinessProbe:
   httpGet:
     path: /
-    port: http
+    port: 8080
