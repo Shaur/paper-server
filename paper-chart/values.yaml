@@ -67,12 +67,12 @@ resources: {}
 livenessProbe:
   httpGet:
     scheme: HTTP
-    path: /
+    path: /actuator/health
     port: 8080
   initialDelaySeconds: 120
 readinessProbe:
   httpGet:
     scheme: HTTP
-    path: /
+    path: /actuator/health
     port: 8080
   initialDelaySeconds: 120

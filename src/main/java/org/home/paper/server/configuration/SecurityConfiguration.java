@@ -25,6 +25,15 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
+    private static final String[] AUTH_WHITELIST = {
+            "/",
+            "/customer/login",
+            "/customer/register",
+            "/private/comics/purgatory/file/**",
+            "/pages/**",
+            "/actuator/health/**"
+    };
+
     private final JwtAuthenticationFilter filter;
     private final UserService userService;
 
@@ -46,7 +55,7 @@ public class SecurityConfiguration {
                 }))
                 .authorizeHttpRequests((requests) ->
                         requests
-                                .requestMatchers("/", "/customer/login", "/customer/register", "/private/comics/purgatory/file/**", "/pages/**").permitAll()
+                                .requestMatchers(AUTH_WHITELIST).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

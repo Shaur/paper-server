@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.3.2"
+    id("org.springframework.boot") version "3.4.1"
     id("org.jetbrains.kotlin.plugin.spring") version "2.0.20"
     id("org.jetbrains.kotlin.plugin.jpa") version "2.0.20"
     id("io.spring.dependency-management") version "1.1.6"
@@ -33,6 +33,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
