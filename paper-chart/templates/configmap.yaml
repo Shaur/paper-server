@@ -5,9 +5,9 @@ metadata:
   labels:
     app: paper-service
 data:
-  SPRING_FLYWAY_URL: "jdbc:postgresql://192.168.3.229:30906/paper"
+  SPRING_FLYWAY_URL: "jdbc:postgresql://postgres-postgresql.default.svc.cluster.local:5432/paper"
   SPRING_FLYWAY_USER: "paper"
   SPRING_FLYWAY_PASSWORD: "paper"
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://192.168.3.229:30906/paper"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-postgresql.default.svc.cluster.local:5432/paper"
   SPRING_DATASOURCE_USERNAME: "paper"
   SPRING_DATASOURCE_PASSWORD: "paper"
