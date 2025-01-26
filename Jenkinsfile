@@ -27,6 +27,7 @@ pipeline {
             steps {
                 withKubeConfig([serverUrl: "${CLUSTER_URL}", namespace: "default"]) {
                     sh 'helm upgrade --install paper-service paper-chart'
+                    sh 'kubectl rollout restart deployment paper-service'
                 }
             }
         }
