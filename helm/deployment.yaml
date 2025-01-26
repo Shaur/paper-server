@@ -21,3 +21,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: paper-service-config
+          volumeMounts:
+            - mountPath: /usr/local/storage
+              name: paper-service-pvc
+      volumes:
+        - name: paper-service-pvc
+          persistentVolumeClaim:
+            claimName: paper-service-pvc
