@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: paper.webhop.me/paper-service
+  repository: warehouse.webhop.me/paper-service
   # This sets the pull policy for images.
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
@@ -59,7 +59,6 @@ ingress:
     - host: chart-example.local
       paths:
         - path: /
-          pathType: ImplementationSpecific
   tls: []
 
 resources: {}
