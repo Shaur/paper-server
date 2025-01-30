@@ -13,13 +13,10 @@ class CbrTool(fileName: String) : ArchiveTool(fileName) {
     override fun getMeta(input: InputStream): ArchiveMeta {
         val xmlFile = Files.createTempFile("ComicsInfo" + System.currentTimeMillis(), "xml").toFile()
         val archive = Archive(input)
-        val descriptors = archive.fileHeaders
-            .map {
-                if (it.fileName.contains("ComicInfo.xml")) {
-                    archive.extractFile(it, FileOutputStream(xmlFile))
-                }
-
-                it.fileName
+        archive.fileHeaders
+            .find { it.fileName.contains("ComicInfo.xml") }
+            ?.let {
+                archive.extractFile(it, FileOutputStream(xmlFile))
             }
 
         if (xmlFile.length() > 0) {
@@ -40,7 +37,7 @@ class CbrTool(fileName: String) : ArchiveTool(fileName) {
         return ArchiveMeta(
             seriesName = seriesName,
             number = number,
-            pagesCount = descriptors.count()
+            pagesCount = archive.fileHeaders.count()
         )
     }
 
@@ -49,12 +46,18 @@ class CbrTool(fileName: String) : ArchiveTool(fileName) {
             destination.mkdirs()
         }
 
-        val files = Junrar.extract(input, destination)
+        var files = Junrar.extract(input, destination)
         files.filter { it.extension == "xml" }
             .forEach {
                 files.remove(it)
                 it.delete()
             }
+
+        val min = files.minBy { it.nameWithoutExtension.length }
+        if (hasTrashPages(files.map { it.nameWithoutExtension })) {
+            files = files - min
+            min.delete()
+        }
 
         val parentFile = files.first().parentFile
         if (parentFile != destination) {

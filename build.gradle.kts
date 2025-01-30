@@ -44,6 +44,7 @@ dependencies {
     implementation("org.postgresql:postgresql")
 
     implementation("com.github.junrar:junrar:7.5.5")
+    implementation("org.apache.commons:commons-text:1.12.0")
 
     implementation(kotlin("stdlib"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

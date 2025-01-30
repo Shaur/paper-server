@@ -69,6 +69,13 @@ class CbzTool(fileName: String) : ArchiveTool(fileName) {
         val comparator = compareBy<File> { it.nameWithoutExtension.length }.then(naturalOrder())
 
         val sorted = (destination.listFiles() ?: emptyArray()).sortedWith(comparator)
+
+        val min = sorted.minBy { it.nameWithoutExtension.length }
+
+        if (hasTrashPages(sorted.map { it.nameWithoutExtension })) {
+            min.delete()
+        }
+
         sorted.forEachIndexed { index, file ->
             file.renameTo(destination.resolve("$index.jpg"))
         }
