@@ -38,15 +38,20 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
 
     override val purgatory: StorageService.Purgatory = object : StorageService.Purgatory {
         override operator fun get(id: Long, number: Int): File {
-            return purgatoryDir.resolve(id.toString()).listFiles()[number]
+            return purgatoryDir.resolve(id.toString()).listFiles()
+                .sortedWith(COMPARATOR)[number]
         }
     }
 
     override val page: StorageService.Page = object : StorageService.Page {
         override fun get(id: Long, number: Int): File {
-            return issuesDir.resolve(id.toString()).listFiles()[number]
+            return issuesDir.resolve(id.toString()).listFiles()
+                .sortedWith(COMPARATOR)[number]
         }
 
     }
 
+    companion object {
+        private val COMPARATOR = compareBy<File> { it.nameWithoutExtension.length }.then(naturalOrder())
+    }
 }
