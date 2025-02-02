@@ -5,5 +5,6 @@ data class SeriesCatalogItemView(
     val title: String,
     val publisher: String,
     val issuesCount: Int,
-    val cover: String
+    val cover: String,
+    val subscribed: Boolean = false
 )

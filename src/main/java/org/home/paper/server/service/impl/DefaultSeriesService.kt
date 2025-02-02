@@ -30,14 +30,16 @@ class DefaultSeriesService(
     }
 
     override fun find(limit: Int, pageNumber: Int): List<SeriesCatalogItemView> {
-        return repository.find(PageRequest.of(pageNumber, limit))
+        val user = (SecurityContextHolder.getContext().authentication.principal as User)
+        return repository.find(user.id, PageRequest.of(pageNumber, limit))
             .map { projection ->
                 SeriesCatalogItemView(
                     id = projection.getId(),
                     title = projection.title(),
                     publisher = projection.getPublisher(),
                     issuesCount = projection.getIssuesCount(),
-                    cover = "/pages/${projection.getMinIssueId()}/0"
+                    cover = "/pages/${projection.getMinIssueId()}/0",
+                    subscribed = projection.getSubscribed()
                 )
             }
     }
@@ -45,5 +47,10 @@ class DefaultSeriesService(
     override fun subscribe(seriesId: Long) {
         val user = (SecurityContextHolder.getContext().authentication.principal as User)
         subscriptionRepository.save(SeriesSubscription(user.id, seriesId))
+    }
+
+    override fun unsubscribe(seriesId: Long) {
+        val user = (SecurityContextHolder.getContext().authentication.principal as User)
+        subscriptionRepository.delete(SeriesSubscription(user.id, seriesId))
     }
 }

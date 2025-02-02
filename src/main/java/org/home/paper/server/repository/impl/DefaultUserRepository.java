@@ -56,4 +56,9 @@ public class DefaultUserRepository implements UserRepository {
 
         return Optional.of(user);
     }
+
+    @Override
+    public void deleteAll() {
+        template.execute("delete from user_data");
+    }
 }

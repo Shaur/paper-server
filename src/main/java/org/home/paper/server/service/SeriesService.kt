@@ -10,4 +10,6 @@ interface SeriesService {
     fun find(limit: Int, pageNumber: Int): List<SeriesCatalogItemView>
 
     fun subscribe(seriesId: Long)
+
+    fun unsubscribe(seriesId: Long)
 }

@@ -35,11 +35,12 @@ interface SeriesRepository : CrudRepository<Series, Long> {
                 min(EXTRACT(YEAR FROM i.publicationDate)) as minYear, 
                 max(EXTRACT(YEAR FROM i.publicationDate)) as maxYear,
                 min(i.id) as minIssueId,
-                count(i.id) as issuesCount
+                count(i.id) as issuesCount,
+                exists (select 1 from series_subscription ss where ss.seriesId = s.id and ss.userId = :userId) as subscribed
             from series s 
                 left join issue i on i.seriesId = s.id
             group by s.id, s.title
         """
     )
-    fun find(pageable: Pageable): List<SeriesCatalogueItemProjection>
+    fun find(userId: Long, pageable: Pageable): List<SeriesCatalogueItemProjection>
 }

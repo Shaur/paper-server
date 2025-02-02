@@ -4,7 +4,9 @@ import org.home.paper.server.model.projection.BaseSeriesProjection
 
 fun BaseSeriesProjection.title(): String {
     return with(this) {
-        if (getMinYear() == getMaxYear()) {
+        if (getMinYear() == null && getMaxYear() == null) {
+            getTitle()
+        } else if (getMinYear() == getMaxYear()) {
             "${getTitle()} (${getMinYear()})"
         } else {
             "${getTitle()} (${getMinYear()} - ${getMaxYear()})"

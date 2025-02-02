@@ -33,4 +33,9 @@ class SeriesPublicController(
         service.subscribe(id)
     }
 
+    @PutMapping("/{id}/unsubscribe")
+    fun unsubscribe(@PathVariable id: Long) {
+        service.unsubscribe(id)
+    }
+
 }

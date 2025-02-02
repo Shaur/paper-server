@@ -11,4 +11,9 @@ public interface UserRepository {
     boolean existsByUsername(String username);
 
     Optional<User> findByUsername(String username);
+
+    /**
+     * Delete all users. Using only for tests
+     */
+    void deleteAll();
 }

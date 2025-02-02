@@ -2,6 +2,7 @@ package org.home.paper.server.controller
 
 import org.assertj.core.api.Assertions.assertThat
 import org.home.paper.server.Application
+import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.model.Series
 import org.home.paper.server.model.SeriesSubscription
 import org.home.paper.server.model.User
@@ -9,6 +10,7 @@ import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.repository.SeriesSubscriptionRepository
 import org.home.paper.server.repository.UserRepository
 import org.home.paper.server.service.JwtService
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -44,16 +46,19 @@ class SeriesPublicControllerTest {
     @Autowired
     private lateinit var jwtService: JwtService
 
+    @BeforeEach
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-    fun setUpUserAndSeries(): Pair<User, Series> {
-        val user = userRepository.save(User(null, "user", "password"))
-        val series = seriesRepository.save(Series(null, "test", "someone"))
-        return user to series
+    fun beforeEach() {
+        userRepository.deleteAll()
+        seriesRepository.deleteAll()
+        subscriptionRepository.deleteAll()
     }
 
     @Test
     fun `series subscribe test`() {
-        val (user, series) = setUpUserAndSeries()
+        val user = userRepository.save(User(null, "user", "password"))
+        val series = seriesRepository.save(Series(null, "test", "someone"))
+
         val jwtToken = jwtService.generateToken(user)
 
         val headers = HttpHeaders()
@@ -70,6 +75,79 @@ class SeriesPublicControllerTest {
         val subscriptions = subscriptionRepository.getByUserId(user.id)
         assertThat(subscriptions).hasSize(1)
         assertThat(subscriptions.first()).isEqualTo(SeriesSubscription(user.id, series.id!!))
+    }
+
+    @Test
+    fun `unsubscribe series test`() {
+        val user = userRepository.save(User(null, "user", "password"))
+        val series = seriesRepository.save(Series(null, "test", "someone"))
+        val jwtToken = jwtService.generateToken(user)
+
+        subscriptionRepository.save(SeriesSubscription(user.id, series.id!!))
+        var subscriptions = subscriptionRepository.getByUserId(user.id)
+        assertThat(subscriptions).hasSize(1)
+
+        val headers = HttpHeaders()
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
+
+        val response = restTemplate.exchange<Void>(
+            "/series/${series.id}/unsubscribe",
+            HttpMethod.PUT,
+            HttpEntity(null, headers),
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        subscriptions = subscriptionRepository.getByUserId(user.id)
+        assertThat(subscriptions).hasSize(0)
+    }
+
+    @Test
+    fun `find unsubscribed series`(){
+        val user = userRepository.save(User(null, "user", "password"))
+        val series = seriesRepository.save(Series(null, "test", "someone"))
+        val jwtToken = jwtService.generateToken(user)
+
+        val headers = HttpHeaders()
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
+
+        val response = restTemplate.exchange<List<SeriesCatalogItemView>>(
+            "/series",
+            HttpMethod.GET,
+            HttpEntity(null, headers),
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body).isNotEmpty
+
+        val seriesDescription = response.body?.first()
+        assertThat(seriesDescription?.id).isEqualTo(series.id)
+        assertThat(seriesDescription?.title).isEqualTo(series.title)
+        assertThat(seriesDescription?.subscribed).isEqualTo(false)
+    }
+
+    @Test
+    fun `find subscribed series`(){
+        val user = userRepository.save(User(null, "user", "password"))
+        val series = seriesRepository.save(Series(null, "test", "someone"))
+        subscriptionRepository.save(SeriesSubscription(user.id, series.id!!))
+        val jwtToken = jwtService.generateToken(user)
+
+        val headers = HttpHeaders()
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
+
+        val response = restTemplate.exchange<List<SeriesCatalogItemView>>(
+            "/series",
+            HttpMethod.GET,
+            HttpEntity(null, headers),
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body).isNotEmpty
+
+        val seriesDescription = response.body?.first()
+        assertThat(seriesDescription?.id).isEqualTo(series.id)
+        assertThat(seriesDescription?.title).isEqualTo(series.title)
+        assertThat(seriesDescription?.subscribed).isEqualTo(true)
     }
 
     object Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
