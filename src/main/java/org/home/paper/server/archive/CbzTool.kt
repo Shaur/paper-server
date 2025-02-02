@@ -21,6 +21,7 @@ class CbzTool(fileName: String) : ArchiveTool(fileName) {
                 }
                 it.name
             }
+            .toList()
 
         if (xmlFile.length() > 0) {
             val meta = extractMetaFromXml(xmlFile)

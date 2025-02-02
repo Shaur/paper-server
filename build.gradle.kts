@@ -29,6 +29,8 @@ repositories {
     mavenCentral()
 }
 
+val mockitoAgent = configurations.create("mockitoAgent")
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -52,9 +54,13 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:postgresql:1.20.4")
+    testImplementation("org.mockito:mockito-core:5.15.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    mockitoAgent("org.mockito:mockito-core:5.15.2") { isTransitive = false }
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs("-javaagent:${mockitoAgent.asPath}")
 }

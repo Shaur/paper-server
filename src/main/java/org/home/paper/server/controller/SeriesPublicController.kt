@@ -3,10 +3,7 @@ package org.home.paper.server.controller
 import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.service.SeriesService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/series")
@@ -29,6 +26,11 @@ class SeriesPublicController(
         @RequestParam("offset", required = false) offset: Int = 0
     ): List<SeriesCatalogItemView> {
         return service.find(limit, offset)
+    }
+
+    @PutMapping("/{id}/subscribe")
+    fun subscribe(@PathVariable id: Long) {
+        service.subscribe(id)
     }
 
 }

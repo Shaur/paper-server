@@ -3,15 +3,19 @@ package org.home.paper.server.service.impl
 import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.extensions.title
-import org.home.paper.server.model.projection.SeriesCatalogueItemProjection
+import org.home.paper.server.model.SeriesSubscription
+import org.home.paper.server.model.User
 import org.home.paper.server.repository.SeriesRepository
+import org.home.paper.server.repository.SeriesSubscriptionRepository
 import org.home.paper.server.service.SeriesService
 import org.springframework.data.domain.PageRequest
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
 @Service
 class DefaultSeriesService(
-    private val repository: SeriesRepository
+    private val repository: SeriesRepository,
+    private val subscriptionRepository: SeriesSubscriptionRepository
 ) : SeriesService {
 
     override fun findForAutocompletion(
@@ -36,5 +40,10 @@ class DefaultSeriesService(
                     cover = "/pages/${projection.getMinIssueId()}/0"
                 )
             }
+    }
+
+    override fun subscribe(seriesId: Long) {
+        val user = (SecurityContextHolder.getContext().authentication.principal as User)
+        subscriptionRepository.save(SeriesSubscription(user.id, seriesId))
     }
 }
