@@ -39,6 +39,9 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          volumeMounts:
+            - mountPath: "/usr/local/storage"
+              name: paper-service-pvc
           envFrom:
             - configMapRef:
                 name: paper-service-config
