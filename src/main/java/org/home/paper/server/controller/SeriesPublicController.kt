@@ -2,13 +2,15 @@ package org.home.paper.server.controller
 
 import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
+import org.home.paper.server.service.IssueService
 import org.home.paper.server.service.SeriesService
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/series")
 class SeriesPublicController(
-    private val service: SeriesService
+    private val seriesService: SeriesService,
+    private val issueService: IssueService
 ) {
 
     @GetMapping("/autocomplete")
@@ -17,7 +19,7 @@ class SeriesPublicController(
         @RequestParam("limit", required = false) limit: Int = 10,
         @RequestParam("offset", required = false) offset: Int = 0
     ): List<SeriesAutocompletionView> {
-        return service.findForAutocompletion(titlePart, limit, offset)
+        return seriesService.findForAutocompletion(titlePart, limit, offset)
     }
 
     @GetMapping
@@ -25,17 +27,20 @@ class SeriesPublicController(
         @RequestParam("limit", required = false) limit: Int = 10,
         @RequestParam("offset", required = false) offset: Int = 0
     ): List<SeriesCatalogItemView> {
-        return service.find(limit, offset)
+        return seriesService.find(limit, offset)
     }
+
+    @GetMapping("/{id}/issues")
+    fun getIssues(@PathVariable id: Long) = issueService.getBySeriesId(id)
 
     @PutMapping("/{id}/subscribe")
     fun subscribe(@PathVariable id: Long) {
-        service.subscribe(id)
+        seriesService.subscribe(id)
     }
 
     @PutMapping("/{id}/unsubscribe")
     fun unsubscribe(@PathVariable id: Long) {
-        service.unsubscribe(id)
+        seriesService.unsubscribe(id)
     }
 
 }
