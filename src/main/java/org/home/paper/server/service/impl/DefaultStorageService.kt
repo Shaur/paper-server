@@ -1,5 +1,6 @@
 package org.home.paper.server.service.impl
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.home.paper.server.configuration.properties.StorageProperties
 import org.home.paper.server.service.StorageService
 import org.springframework.stereotype.Service
@@ -13,6 +14,8 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
 
     private val purgatoryDir = File(properties.purgatoryPath)
     private val issuesDir = File(properties.issuesPath)
+
+    private val log = KotlinLogging.logger { }
 
     init {
         if (!issuesDir.exists()) issuesDir.mkdirs()
@@ -45,6 +48,7 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
 
     override val page: StorageService.Page = object : StorageService.Page {
         override fun get(id: Long, number: Int): File {
+            log.info { "Get file for issue $id and number $number" }
             return issuesDir.resolve(id.toString()).listFiles()
                 .sortedWith(COMPARATOR)[number]
         }

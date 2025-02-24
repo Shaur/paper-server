@@ -12,4 +12,4 @@ data:
   SPRING_DATASOURCE_USERNAME: "paper"
   SPRING_DATASOURCE_PASSWORD: "paper"
   STORAGE_PURGATORY_PATH: "/usr/local/storage/purgatory"
-  STORAGE_ISSUES_PATH: "/usr/local/storage/purgatory/issues"
+  STORAGE_ISSUES_PATH: "/usr/local/storage/issues"
