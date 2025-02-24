@@ -4,6 +4,8 @@ import org.home.paper.server.Application;
 import org.home.paper.server.dto.JwtAuthenticationResponse;
 import org.home.paper.server.dto.SignInRequest;
 import org.home.paper.server.dto.SignUpRequest;
+import org.home.paper.server.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +23,14 @@ public class CustomerControllerTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @AfterEach
+    void afterEach() {
+        userRepository.deleteAll();
+    }
 
     @Test
     public void authorizationTest() {

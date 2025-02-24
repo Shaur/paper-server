@@ -16,9 +16,23 @@ class DefaultIssueRepository(
         return entityManager.merge(issue)
     }
 
+    override fun getById(id: Long): Issue? {
+        return entityManager.createQuery("select i from issue i where i.id = :id", Issue::class.java)
+            .setParameter("id", id)
+            .resultList
+            .firstOrNull()
+    }
+
     override fun getBySeriesId(seriesId: Long): List<Issue> {
         return entityManager.createQuery("select i from issue i where i.seriesId = :seriesId", Issue::class.java)
             .setParameter("seriesId", seriesId)
             .resultList
     }
+
+    @Transactional
+    override fun deleteAll() {
+        entityManager.createQuery("delete from issue").executeUpdate()
+    }
+
+
 }

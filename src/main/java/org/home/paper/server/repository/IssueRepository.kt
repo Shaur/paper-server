@@ -6,5 +6,9 @@ interface IssueRepository {
 
     fun create(issue: Issue): Issue
 
+    fun getById(id: Long): Issue?
+
     fun getBySeriesId(seriesId: Long): List<Issue>
+
+    fun deleteAll()
 }

@@ -10,7 +10,7 @@ import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.repository.SeriesSubscriptionRepository
 import org.home.paper.server.repository.UserRepository
 import org.home.paper.server.service.JwtService
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -46,9 +46,9 @@ class SeriesPublicControllerTest {
     @Autowired
     private lateinit var jwtService: JwtService
 
-    @BeforeEach
+    @AfterEach
     @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
-    fun beforeEach() {
+    fun afterEach() {
         userRepository.deleteAll()
         seriesRepository.deleteAll()
         subscriptionRepository.deleteAll()
