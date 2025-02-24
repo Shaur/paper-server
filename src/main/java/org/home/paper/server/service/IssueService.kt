@@ -2,7 +2,6 @@ package org.home.paper.server.service
 
 import org.home.paper.server.dto.IssueView
 import org.home.paper.server.dto.ReadingProgressUpdate
-import org.home.paper.server.model.Issue
 
 interface IssueService {
 

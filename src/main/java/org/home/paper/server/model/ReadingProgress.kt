@@ -6,7 +6,7 @@ import jakarta.persistence.IdClass
 
 @Entity(name = "reading_progress")
 @IdClass(ReadingProgressKey::class)
-open class ReadingProgress(
+class ReadingProgress(
     @Id
     val userId: Long,
 
