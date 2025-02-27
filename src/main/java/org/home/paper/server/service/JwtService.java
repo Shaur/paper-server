@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,11 +50,12 @@ public class JwtService {
     }
 
     private String generateToken(Map<String, Object> claims, UserDetails userDetails) {
+        var expirationTime = LocalDateTime.now().plusDays(30).toInstant(ZoneOffset.UTC).toEpochMilli();
         return Jwts.builder()
                 .claims(claims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 100000 * 60 * 24))
+                .expiration(new Date(expirationTime))
                 .signWith(getSigningKey())
                 .compact();
 

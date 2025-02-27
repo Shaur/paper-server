@@ -48,7 +48,6 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
 
     override val page: StorageService.Page = object : StorageService.Page {
         override fun get(id: Long, number: Int): File {
-            log.info { "Get file for issue $id and number $number" }
             return issuesDir.resolve(id.toString()).listFiles()
                 .sortedWith(COMPARATOR)[number]
         }
