@@ -16,4 +16,7 @@ class IssueController(
         @RequestBody body: ReadingProgressUpdate
     ) = service.updateProgress(id, body)
 
+
+    @GetMapping("/{id}")
+    fun get(@PathVariable id: Long) = service.get(id)
 }

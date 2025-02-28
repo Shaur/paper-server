@@ -9,4 +9,6 @@ interface IssueService {
 
     fun updateProgress(id: Long, body: ReadingProgressUpdate)
 
+    fun get(id: Long): IssueView
+
 }

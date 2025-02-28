@@ -30,6 +30,11 @@ class SeriesPublicController(
         return seriesService.find(limit, offset)
     }
 
+    @GetMapping("/{id}")
+    fun get(@PathVariable id: Long): SeriesCatalogItemView {
+        return seriesService.get(id)
+    }
+
     @GetMapping("/{id}/issues")
     fun getIssues(@PathVariable id: Long) = issueService.getBySeriesId(id)
 

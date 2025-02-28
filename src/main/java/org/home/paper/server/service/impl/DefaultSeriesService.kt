@@ -2,7 +2,9 @@ package org.home.paper.server.service.impl
 
 import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
+import org.home.paper.server.exceptions.ObjectNotFoundException
 import org.home.paper.server.extensions.title
+import org.home.paper.server.model.Series
 import org.home.paper.server.model.SeriesSubscription
 import org.home.paper.server.model.User
 import org.home.paper.server.repository.SeriesRepository
@@ -53,5 +55,10 @@ class DefaultSeriesService(
     override fun unsubscribe(seriesId: Long) {
         val user = (SecurityContextHolder.getContext().authentication.principal as User)
         subscriptionRepository.delete(SeriesSubscription(user.id, seriesId))
+    }
+
+    override fun get(id: Long): SeriesCatalogItemView {
+        val user = (SecurityContextHolder.getContext().authentication.principal as User)
+        return repository.getById(id, user.id) ?: throw ObjectNotFoundException("Series", id)
     }
 }

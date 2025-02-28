@@ -13,6 +13,7 @@ import org.home.paper.server.repository.ReadingProgressRepository
 import org.home.paper.server.service.IssueService
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class DefaultIssueService(
@@ -40,6 +41,23 @@ class DefaultIssueService(
 
             readingProgressRepository.save(progress.update(currentPage = body.currentPage, updateTime = body.updateTime))
         }
+    }
+
+    override fun get(id: Long): IssueView {
+        val user = (SecurityContextHolder.getContext().authentication.principal as User)
+        val userId = user.id
+        val issue = issueRepository.getById(id) ?: throw ObjectNotFoundException(Issue::class.toString(), id)
+        val readingProgress = readingProgressRepository.findById(ReadingProgressKey(userId, id))
+
+        return IssueView(
+            id = issue.id!!,
+            number = issue.number,
+            summary = issue.summary,
+            seriesId = issue.seriesId,
+            pagesCount = issue.pagesCount,
+            currentPage = readingProgress.getOrNull()?.currentPage ?: 0,
+            publicationDate = issue.publicationDate
+        )
     }
 
     override fun getBySeriesId(seriesId: Long): List<IssueView> {
