@@ -1,6 +1,5 @@
 package org.home.paper.server.repository
 
-import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.model.Series
 import org.home.paper.server.model.projection.SeriesCatalogueItemProjection
 import org.home.paper.server.model.projection.SeriesSearchViewProjection
@@ -67,5 +66,5 @@ interface SeriesRepository : CrudRepository<Series, Long> {
             group by s.id, s.title
         """
     )
-    fun getById(id: Long, userId: Long): SeriesCatalogItemView?
+    fun getById(id: Long, userId: Long): SeriesCatalogueItemProjection?
 }

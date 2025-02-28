@@ -4,9 +4,9 @@ import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.exceptions.ObjectNotFoundException
 import org.home.paper.server.extensions.title
-import org.home.paper.server.model.Series
 import org.home.paper.server.model.SeriesSubscription
 import org.home.paper.server.model.User
+import org.home.paper.server.model.projection.SeriesCatalogueItemProjection
 import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.repository.SeriesSubscriptionRepository
 import org.home.paper.server.service.SeriesService
@@ -23,9 +23,9 @@ class DefaultSeriesService(
     override fun findForAutocompletion(
         titlePart: String?,
         limit: Int,
-        pageNumber: Int
+        offset: Int
     ): List<SeriesAutocompletionView> {
-        return repository.findForAutocompletion(titlePart, PageRequest.of(pageNumber, limit))
+        return repository.findForAutocompletion(titlePart, PageRequest.of(offset, limit))
             .map {
                 SeriesAutocompletionView(it.getId(), it.title())
             }
@@ -33,18 +33,7 @@ class DefaultSeriesService(
 
     override fun find(limit: Int, pageNumber: Int): List<SeriesCatalogItemView> {
         val user = (SecurityContextHolder.getContext().authentication.principal as User)
-        return repository.find(user.id, PageRequest.of(pageNumber, limit))
-            .map { projection ->
-                SeriesCatalogItemView(
-                    id = projection.getId(),
-                    title = projection.title(),
-                    publisher = projection.getPublisher(),
-                    issuesCount = projection.getIssuesCount(),
-                    cover = "/pages/${projection.getMinIssueId()}/0",
-                    completedIssuesCount = projection.getCompletedIssuesCount(),
-                    subscribed = projection.getSubscribed()
-                )
-            }
+        return repository.find(user.id, PageRequest.of(pageNumber, limit)).map(::converter)
     }
 
     override fun subscribe(seriesId: Long) {
@@ -59,6 +48,19 @@ class DefaultSeriesService(
 
     override fun get(id: Long): SeriesCatalogItemView {
         val user = (SecurityContextHolder.getContext().authentication.principal as User)
-        return repository.getById(id, user.id) ?: throw ObjectNotFoundException("Series", id)
+        val projection = repository.getById(id, user.id) ?: throw ObjectNotFoundException("Series", id)
+        return converter(projection)
+    }
+
+    private fun converter(projection: SeriesCatalogueItemProjection): SeriesCatalogItemView {
+        return SeriesCatalogItemView(
+            id = projection.getId(),
+            title = projection.title(),
+            publisher = projection.getPublisher(),
+            issuesCount = projection.getIssuesCount(),
+            cover = "/pages/${projection.getMinIssueId()}/0",
+            completedIssuesCount = projection.getCompletedIssuesCount(),
+            subscribed = projection.getSubscribed()
+        )
     }
 }
