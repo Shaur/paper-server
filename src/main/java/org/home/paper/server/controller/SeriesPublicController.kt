@@ -24,7 +24,7 @@ class SeriesPublicController(
 
     @GetMapping
     fun find(
-        @RequestParam("limit", required = false) limit: Int = 10,
+        @RequestParam("limit", required = false) limit: Int = 20,
         @RequestParam("offset", required = false) offset: Int = 0
     ): List<SeriesCatalogItemView> {
         return seriesService.find(limit, offset)
