@@ -42,7 +42,7 @@ interface SeriesRepository : CrudRepository<Series, Long> {
                 left join issue i on i.series_id = s.id
                 left join reading_progress rp on (rp.issue_id = i.id and rp.user_id = :userId)
             group by s.id, s.title
-            order by completedIssuesCount, s.title
+            order by count(rp.current_page + 1 = i.pages_count) = count(i.id), s.title
         """,
         nativeQuery = true
     )
