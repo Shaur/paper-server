@@ -37,12 +37,12 @@ interface SeriesRepository : CrudRepository<Series, Long> {
                 min(i.id) as minIssueId,
                 count(i.id) as issuesCount,
                 exists (select 1 from series_subscription ss where ss.series_id = s.id and ss.user_id = :userId) as subscribed,
-                count(rp.current_page + 1 = i.pages_count) as completedIssuesCount
+                count(case when rp.current_page + 1 = i.pages_count then 1 end) as completedIssuesCount
             from series s 
                 left join issue i on i.series_id = s.id
                 left join reading_progress rp on (rp.issue_id = i.id and rp.user_id = :userId)
             group by s.id, s.title
-            order by count(rp.current_page + 1 = i.pages_count) = count(i.id), s.title
+            order by count(case when rp.current_page + 1 = i.pages_count then 1 end) = count(i.id), s.title
         """,
         nativeQuery = true
     )
