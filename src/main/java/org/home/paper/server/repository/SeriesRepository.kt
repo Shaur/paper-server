@@ -32,18 +32,19 @@ interface SeriesRepository : CrudRepository<Series, Long> {
                 s.id as id,
                 s.title as title,
                 s.publisher as publisher,
-                min(EXTRACT(YEAR FROM i.publicationDate)) as minYear, 
-                max(EXTRACT(YEAR FROM i.publicationDate)) as maxYear,
+                min(EXTRACT(YEAR FROM i.publication_date)) as minYear, 
+                max(EXTRACT(YEAR FROM i.publication_date)) as maxYear,
                 min(i.id) as minIssueId,
                 count(i.id) as issuesCount,
-                exists (select 1 from series_subscription ss where ss.seriesId = s.id and ss.userId = :userId) as subscribed,
-                count (CASE WHEN rp.currentPage + 1 = i.pagesCount THEN 1 END) as completedIssuesCount
+                exists (select 1 from series_subscription ss where ss.series_id = s.id and ss.user_id = :userId) as subscribed,
+                count(rp.current_page + 1 = i.pages_count) as completedIssuesCount
             from series s 
-                left join issue i on i.seriesId = s.id
-                left join reading_progress rp on (rp.issueId = i.id and rp.userId = :userId)
+                left join issue i on i.series_id = s.id
+                left join reading_progress rp on (rp.issue_id = i.id and rp.user_id = :userId)
             group by s.id, s.title
-            order by s.title
-        """
+            order by completedIssuesCount, s.title
+        """,
+        nativeQuery = true
     )
     fun find(userId: Long, pageable: Pageable): List<SeriesCatalogueItemProjection>
 
