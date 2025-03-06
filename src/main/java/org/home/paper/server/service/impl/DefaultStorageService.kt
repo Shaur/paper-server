@@ -68,7 +68,7 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
             val scaledFile = issueCacheDir
                 .listFiles()
                 ?.sortedWith(COMPARATOR)
-                ?.get(number)
+                ?.getOrNull(number)
 
             if (scaledFile != null) {
                 return scaledFile
