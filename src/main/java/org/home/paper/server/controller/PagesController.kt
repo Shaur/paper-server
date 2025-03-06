@@ -22,7 +22,7 @@ class PagesController(
         @PathVariable number: Int,
         @RequestParam("size", required = false) size: PageSize = PageSize.ORIGINAL
     ): ResponseEntity<Resource> {
-        val file = storageService.page[id, number]
+        val file = storageService.page[id, number, size]
 
         val contentDisposition = ContentDisposition.builder("attachment")
             .filename("$number.jpeg")
