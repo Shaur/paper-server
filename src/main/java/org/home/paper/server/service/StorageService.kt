@@ -1,5 +1,6 @@
 package org.home.paper.server.service
 
+import org.home.paper.server.dto.PageSize
 import java.io.File
 import java.io.InputStream
 
@@ -22,6 +23,6 @@ interface StorageService {
     }
 
     interface Page {
-        operator fun get(id: Long, number: Int): File
+        operator fun get(id: Long, number: Int, size: PageSize = PageSize.ORIGINAL): File
     }
 }

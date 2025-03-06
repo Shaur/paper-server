@@ -53,6 +53,9 @@ dependencies {
 
     implementation("io.github.oshai:kotlin-logging:7.0.3")
 
+    //Image scaler
+    implementation("org.imgscalr:imgscalr-lib:4.2")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:postgresql")
