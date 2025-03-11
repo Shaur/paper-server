@@ -68,5 +68,6 @@ class DefaultPurgatoryService(
         storageService.transfer(purgatoryId, savedIssue.id!!)
 
         purgatoryRepository.delete(purgatoryId)
+        storageService.deletePurgatoryDir(purgatoryId)
     }
 }

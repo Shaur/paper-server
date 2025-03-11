@@ -19,8 +19,6 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
     private val issuesDir = File(properties.issuesPath)
     private val cacheDir = issuesDir.resolve("cache")
 
-    private val log = KotlinLogging.logger { }
-
     init {
         if (!issuesDir.exists()) issuesDir.mkdirs()
         if (!purgatoryDir.exists()) purgatoryDir.mkdirs()

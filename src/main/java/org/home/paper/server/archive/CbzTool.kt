@@ -1,10 +1,12 @@
 package org.home.paper.server.archive
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.home.paper.server.model.ArchiveMeta
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -66,9 +68,7 @@ class CbzTool(fileName: String) : ArchiveTool(fileName) {
                 }
         }
 
-        val comparator = compareBy<File> { it.nameWithoutExtension.length }.then(naturalOrder())
-
-        val sorted = (destination.listFiles() ?: emptyArray()).sortedWith(comparator)
+        val sorted = (destination.listFiles() ?: emptyArray())
 
         val min = sorted.minBy { it.nameWithoutExtension.length }
 
@@ -76,8 +76,11 @@ class CbzTool(fileName: String) : ArchiveTool(fileName) {
             min.delete()
         }
 
+        val digits = sorted.size.toString().length
         sorted.forEachIndexed { index, file ->
-            file.renameTo(destination.resolve("$index.jpg"))
+            val filename = String.format("%0${digits}d.jpg", index)
+            Files.copy(file.inputStream(), destination.resolve(filename).toPath(), StandardCopyOption.REPLACE_EXISTING)
+            file.delete()
         }
     }
 }
