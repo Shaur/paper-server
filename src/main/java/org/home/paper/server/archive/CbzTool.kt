@@ -1,6 +1,5 @@
 package org.home.paper.server.archive
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import org.home.paper.server.model.ArchiveMeta
 import java.io.File
 import java.io.FileOutputStream
@@ -68,7 +67,8 @@ class CbzTool(fileName: String) : ArchiveTool(fileName) {
                 }
         }
 
-        val sorted = (destination.listFiles() ?: emptyArray())
+        val comparator = compareBy<File> { it.nameWithoutExtension.length }.then(naturalOrder())
+        val sorted = (destination.listFiles() ?: emptyArray()).sortedWith(comparator)
 
         val min = sorted.minBy { it.nameWithoutExtension.length }
 
