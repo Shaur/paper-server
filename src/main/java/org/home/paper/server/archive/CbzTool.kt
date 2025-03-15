@@ -70,12 +70,6 @@ class CbzTool(fileName: String) : ArchiveTool(fileName) {
         val comparator = compareBy<File> { it.nameWithoutExtension.length }.then(naturalOrder())
         val sorted = (destination.listFiles() ?: emptyArray()).sortedWith(comparator)
 
-        val min = sorted.minBy { it.nameWithoutExtension.length }
-
-        if (hasTrashPages(sorted.map { it.nameWithoutExtension })) {
-            min.delete()
-        }
-
         val digits = sorted.size.toString().length
         sorted.forEachIndexed { index, file ->
             val filename = String.format("%0${digits}d.jpg", index)

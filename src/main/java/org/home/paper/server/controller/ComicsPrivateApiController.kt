@@ -3,6 +3,7 @@ package org.home.paper.server.controller
 import org.apache.coyote.BadRequestException
 import org.home.paper.server.archive.ArchiveToolFactory
 import org.home.paper.server.dto.ApproveRequest
+import org.home.paper.server.dto.PageSize
 import org.home.paper.server.model.PurgatoryItem
 import org.home.paper.server.service.PurgatoryService
 import org.home.paper.server.service.StorageService
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
@@ -61,8 +63,12 @@ class ComicsPrivateApiController(
     }
 
     @GetMapping("/purgatory/file/{id}/{number}")
-    fun getFile(@PathVariable id: Long, @PathVariable number: Int): ResponseEntity<Resource> {
-        val file = storageService.purgatory[id, number]
+    fun getFile(
+        @PathVariable id: Long,
+        @PathVariable number: Int,
+        @RequestParam("size", required = false) size: PageSize = PageSize.ORIGINAL
+    ): ResponseEntity<Resource> {
+        val file = storageService.purgatory[id, number, size]
         val contentDisposition = ContentDisposition.builder("attachment")
             .filename("$number.jpeg")
             .build()

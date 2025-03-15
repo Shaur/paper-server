@@ -46,18 +46,12 @@ class CbrTool(fileName: String) : ArchiveTool(fileName) {
             destination.mkdirs()
         }
 
-        var files = Junrar.extract(input, destination)
+        val files = Junrar.extract(input, destination)
         files.filter { it.extension == "xml" }
             .forEach {
                 files.remove(it)
                 it.delete()
             }
-
-        val min = files.minBy { it.nameWithoutExtension.length }
-        if (hasTrashPages(files.map { it.nameWithoutExtension })) {
-            files = files - min
-            min.delete()
-        }
 
         val parentFile = files.first().parentFile
         if (parentFile != destination) {

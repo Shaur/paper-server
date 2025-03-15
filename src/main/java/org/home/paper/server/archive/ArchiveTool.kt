@@ -1,6 +1,5 @@
 package org.home.paper.server.archive
 
-import org.apache.commons.text.similarity.LevenshteinDistance
 import org.home.paper.server.model.ArchiveMeta
 import java.io.File
 import java.io.InputStream
@@ -118,17 +117,6 @@ abstract class ArchiveTool(protected val fileName: String) {
         }
 
         return builder.toString()
-    }
-
-    protected fun hasTrashPages(names: Collection<String>): Boolean {
-        val distance = LevenshteinDistance()
-
-        val min = names.minBy { it.length }
-        val max = names.maxBy { it.length }
-
-        val threshold = names.size.toString().length
-
-        return distance.apply(min, max) > threshold
     }
 
 }

@@ -1,6 +1,5 @@
 package org.home.paper.server.service.impl
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import org.home.paper.server.configuration.properties.StorageProperties
 import org.home.paper.server.dto.PageSize
 import org.home.paper.server.service.StorageService
@@ -18,15 +17,18 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
     private val purgatoryDir = File(properties.purgatoryPath)
     private val issuesDir = File(properties.issuesPath)
     private val cacheDir = issuesDir.resolve("cache")
+    private val purgatoryCacheDir = purgatoryDir.resolve("cache")
 
     init {
         if (!issuesDir.exists()) issuesDir.mkdirs()
         if (!purgatoryDir.exists()) purgatoryDir.mkdirs()
         if (!cacheDir.exists()) cacheDir.mkdirs()
+        if (!purgatoryCacheDir.exists()) purgatoryCacheDir.mkdirs()
     }
 
     override fun deletePurgatoryDir(id: Long) {
         purgatoryDir.resolve(id.toString()).deleteRecursively()
+        purgatoryCacheDir.resolve(id.toString()).deleteRecursively()
     }
 
     override fun transfer(purgatoryId: Long, issueId: Long) {
@@ -43,9 +45,11 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
     override fun resolvePurgatoryDir(id: Long): File = purgatoryDir.resolve(id.toString())
 
     override val purgatory: StorageService.Purgatory = object : StorageService.Purgatory {
-        override operator fun get(id: Long, number: Int): File {
-            return purgatoryDir.resolve(id.toString()).listFiles()
+        override operator fun get(id: Long, number: Int, size: PageSize): File {
+            val file = purgatoryDir.resolve(id.toString()).listFiles()
                 .sortedWith(COMPARATOR)[number]
+
+            return resolveCache(purgatoryCacheDir, file, size, id, number)
         }
     }
 
@@ -86,6 +90,39 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
             return newScaledFile
         }
 
+    }
+
+    private fun resolveCache(cacheDir: File, originalImg: File, size: PageSize, id: Long, number: Int): File {
+        if (size == PageSize.ORIGINAL) {
+            return originalImg
+        }
+
+        val issueCacheDir = cacheDir.resolve("$id-${size.scale}x")
+        if (!issueCacheDir.exists()) {
+            issueCacheDir.mkdirs()
+        }
+
+        val scaledFile = issueCacheDir
+            .listFiles()
+            ?.sortedWith(COMPARATOR)
+            ?.getOrNull(number)
+
+        if (scaledFile != null) {
+            return scaledFile
+        }
+
+        val inputImage = ImageIO.read(originalImg)
+        val resizedImage = Scalr.resize(
+            inputImage,
+            Scalr.Method.QUALITY,
+            inputImage.width / size.scale,
+            inputImage.height / size.scale
+        )
+
+        val newScaledFile = issueCacheDir.resolve("$number.jpeg")
+        ImageIO.write(resizedImage, "jpg", newScaledFile)
+
+        return newScaledFile
     }
 
     companion object {

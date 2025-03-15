@@ -19,7 +19,7 @@ interface StorageService {
     val page: Page
 
     interface Purgatory {
-        operator fun get(id: Long, number: Int): File
+        operator fun get(id: Long, number: Int, size: PageSize = PageSize.ORIGINAL): File
     }
 
     interface Page {
