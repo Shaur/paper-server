@@ -49,7 +49,7 @@ interface StorageService {
             }
 
             val scaledFile = issueCacheDir.listFiles()
-                ?.first { it.name == "$number.jpeg" }
+                ?.firstOrNull { it.name == "$number.jpeg" }
 
             if (scaledFile != null) {
                 return scaledFile
