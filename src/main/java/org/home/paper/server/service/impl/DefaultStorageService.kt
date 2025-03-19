@@ -1,15 +1,12 @@
 package org.home.paper.server.service.impl
 
 import org.home.paper.server.configuration.properties.StorageProperties
-import org.home.paper.server.dto.PageSize
 import org.home.paper.server.service.StorageService
-import org.imgscalr.Scalr
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import javax.imageio.ImageIO
 
 @Service
 class DefaultStorageService(properties: StorageProperties) : StorageService {
@@ -44,88 +41,8 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
 
     override fun resolvePurgatoryDir(id: Long): File = purgatoryDir.resolve(id.toString())
 
-    override val purgatory: StorageService.Purgatory = object : StorageService.Purgatory {
-        override operator fun get(id: Long, number: Int, size: PageSize): File {
-            val file = purgatoryDir.resolve(id.toString()).listFiles()
-                .sortedWith(COMPARATOR)[number]
+    override val purgatory: StorageService.Storage = StorageService.Storage(purgatoryDir, purgatoryCacheDir)
 
-            return resolveCache(purgatoryCacheDir, file, size, id, number)
-        }
-    }
+    override val page: StorageService.Storage = StorageService.Storage(issuesDir, cacheDir)
 
-    override val page: StorageService.Page = object : StorageService.Page {
-        override fun get(id: Long, number: Int, size: PageSize): File {
-            val file = issuesDir.resolve(id.toString()).listFiles()
-                .sortedWith(COMPARATOR)[number]
-
-            if (size == PageSize.ORIGINAL) {
-                return file
-            }
-
-            val issueCacheDir = cacheDir.resolve("$id-${size.scale}x")
-            if (!issueCacheDir.exists()) {
-                issueCacheDir.mkdirs()
-            }
-
-            val scaledFile = issueCacheDir
-                .listFiles()
-                ?.sortedWith(COMPARATOR)
-                ?.getOrNull(number)
-
-            if (scaledFile != null) {
-                return scaledFile
-            }
-
-            val inputImage = ImageIO.read(file)
-            val resizedImage = Scalr.resize(
-                inputImage,
-                Scalr.Method.QUALITY,
-                inputImage.width / size.scale,
-                inputImage.height / size.scale
-            )
-
-            val newScaledFile = issueCacheDir.resolve("$number.jpeg")
-            ImageIO.write(resizedImage, "jpg", newScaledFile)
-
-            return newScaledFile
-        }
-
-    }
-
-    private fun resolveCache(cacheDir: File, originalImg: File, size: PageSize, id: Long, number: Int): File {
-        if (size == PageSize.ORIGINAL) {
-            return originalImg
-        }
-
-        val issueCacheDir = cacheDir.resolve("$id-${size.scale}x")
-        if (!issueCacheDir.exists()) {
-            issueCacheDir.mkdirs()
-        }
-
-        val scaledFile = issueCacheDir
-            .listFiles()
-            ?.sortedWith(COMPARATOR)
-            ?.getOrNull(number)
-
-        if (scaledFile != null) {
-            return scaledFile
-        }
-
-        val inputImage = ImageIO.read(originalImg)
-        val resizedImage = Scalr.resize(
-            inputImage,
-            Scalr.Method.QUALITY,
-            inputImage.width / size.scale,
-            inputImage.height / size.scale
-        )
-
-        val newScaledFile = issueCacheDir.resolve("$number.jpeg")
-        ImageIO.write(resizedImage, "jpg", newScaledFile)
-
-        return newScaledFile
-    }
-
-    companion object {
-        private val COMPARATOR = compareBy<File> { it.nameWithoutExtension.length }.then(naturalOrder())
-    }
 }
