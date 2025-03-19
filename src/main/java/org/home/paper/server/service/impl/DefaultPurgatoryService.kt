@@ -70,4 +70,16 @@ class DefaultPurgatoryService(
         purgatoryRepository.delete(purgatoryId)
         storageService.deletePurgatoryDir(purgatoryId)
     }
+
+    override fun deletePage(id: Long, number: Int) {
+        val issue = purgatoryRepository.get(id) ?: throw ObjectNotFoundException("Issue", id)
+        storageService.purgatory.deleteFile(id, number)
+
+        val pagesCount = issue.meta.pagesCount - 1
+        val issueUpdate = issue.copy(
+            meta = issue.meta.copy(pagesCount = pagesCount)
+        )
+
+        purgatoryRepository.update(issueUpdate)
+    }
 }

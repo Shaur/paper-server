@@ -73,8 +73,7 @@ class ComicsPrivateApiController(
             .filename("$number.jpeg")
             .build()
 
-        return ResponseEntity
-            .ok()
+        return ResponseEntity.ok()
             .contentLength(file.length())
             .contentType(MediaType.IMAGE_JPEG)
             .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
@@ -84,4 +83,12 @@ class ComicsPrivateApiController(
 
     @DeleteMapping("/purgatory/{id}")
     fun deletePurgatoryItem(@PathVariable id: Long) = purgatoryService.delete(id)
+
+    @DeleteMapping("/purgatory/{id}/{number}")
+    fun deletePage(
+        @PathVariable("id") id: Long,
+        @PathVariable("number") number: Int
+    ) {
+        return purgatoryService.deletePage(id, number)
+    }
 }

@@ -14,4 +14,6 @@ interface PurgatoryService {
 
     fun approve(request: ApproveRequest)
 
+    fun deletePage(id: Long, number: Int)
+
 }

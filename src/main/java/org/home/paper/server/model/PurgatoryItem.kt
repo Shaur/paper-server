@@ -8,12 +8,11 @@ import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 
 @Entity(name = "purgatory")
-class PurgatoryItem(
+data class PurgatoryItem(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
     @JdbcTypeCode(SqlTypes.JSON)
     val meta: ArchiveMeta
-) {
-}
+)

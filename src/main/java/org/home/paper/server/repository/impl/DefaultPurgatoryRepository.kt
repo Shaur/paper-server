@@ -16,6 +16,16 @@ class DefaultPurgatoryRepository(
         return manager.merge(item)
     }
 
+    @Transactional
+    override fun update(item: PurgatoryItem) {
+        manager.merge(item)
+    }
+
+    @Transactional
+    override fun deleteAll() {
+        manager.createQuery("delete from purgatory").executeUpdate()
+    }
+
     override fun get(id: Long): PurgatoryItem? {
         return manager.createQuery("from purgatory p where p.id = :id", PurgatoryItem::class.java)
             .setParameter("id", id)

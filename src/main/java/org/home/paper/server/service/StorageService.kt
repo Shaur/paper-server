@@ -70,6 +70,24 @@ interface StorageService {
 
             return newScaledFile
         }
+
+        fun deleteFile(id: Long, number: Int) {
+            val files = dir.resolve(id.toString()).listFiles()
+                ?: throw FileNotFoundException(id, number)
+
+            val file = files.sortedWith(COMPARATOR)[number] ?: throw FileNotFoundException(id, number)
+            file.delete()
+
+            val cache = cacheDir.resolve(id.toString()).listFiles() ?: return
+
+            val scaleDirs = cache.filter { it.name.startsWith("$id-") && it.isDirectory }
+            for (scaleDir in scaleDirs) {
+                scaleDir.listFiles()
+                    ?.find { it.name == "$number.jpeg" }
+                    ?.delete()
+            }
+
+        }
     }
 
 }

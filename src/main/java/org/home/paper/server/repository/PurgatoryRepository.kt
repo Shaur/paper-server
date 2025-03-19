@@ -11,4 +11,8 @@ interface PurgatoryRepository {
     fun getAll(): List<PurgatoryItem>
 
     fun delete(id: Long)
+
+    fun update(item: PurgatoryItem)
+
+    fun deleteAll()
 }

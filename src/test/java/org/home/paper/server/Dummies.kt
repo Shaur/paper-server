@@ -11,5 +11,5 @@ object Dummies {
     val unsavedSeries = Series(null, "test", "someone")
 
 
-    fun unsavedIssue(seriesId: Long) = Issue(null, "", seriesId = seriesId, pagesCount = 5, publicationDate = Date())
+    fun unsavedIssue(seriesId: Long, pagesCount: Int = 5) = Issue(null, "", seriesId = seriesId, pagesCount = pagesCount, publicationDate = Date())
 }
