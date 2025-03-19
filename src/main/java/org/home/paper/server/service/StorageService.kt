@@ -76,9 +76,9 @@ interface StorageService {
             val file = files.sortedWith(COMPARATOR)[number] ?: throw FileNotFoundException(id, number)
             file.delete()
 
-            val cache = cacheDir.resolve(id.toString()).listFiles() ?: return
+            val scaleDirs = (cacheDir.listFiles() ?: arrayOf<File>())
+                .filter { it.name.startsWith("$id-") && it.isDirectory }
 
-            val scaleDirs = cache.filter { it.name.startsWith("$id-") && it.isDirectory }
             for (scaleDir in scaleDirs) {
                 scaleDir.listFiles()
                     ?.find { it.name == "$number.jpeg" }
