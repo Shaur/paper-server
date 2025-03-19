@@ -48,10 +48,8 @@ interface StorageService {
                 issueCacheDir.mkdirs()
             }
 
-            val scaledFile = issueCacheDir
-                .listFiles()
-                ?.sortedWith(COMPARATOR)
-                ?.getOrNull(number)
+            val scaledFile = issueCacheDir.listFiles()
+                ?.first { it.name == "$number.jpeg" }
 
             if (scaledFile != null) {
                 return scaledFile
