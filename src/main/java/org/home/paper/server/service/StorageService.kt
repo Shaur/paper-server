@@ -35,10 +35,10 @@ interface StorageService {
 
             val file = files.sortedWith(COMPARATOR)[number]
 
-            return resolveCache(file, size, id, number)
+            return resolveCache(file, size, id)
         }
 
-        private fun resolveCache(originalImg: File, size: PageSize, id: Long, number: Int): File {
+        private fun resolveCache(originalImg: File, size: PageSize, id: Long): File {
             if (size == PageSize.ORIGINAL) {
                 return originalImg
             }
@@ -49,7 +49,7 @@ interface StorageService {
             }
 
             val scaledFile = issueCacheDir.listFiles()
-                ?.firstOrNull { it.name == "$number.jpeg" }
+                ?.firstOrNull { it.name == originalImg.name }
 
             if (scaledFile != null) {
                 return scaledFile
@@ -63,7 +63,7 @@ interface StorageService {
                 inputImage.height / size.scale
             )
 
-            val newScaledFile = issueCacheDir.resolve("$number.jpeg")
+            val newScaledFile = issueCacheDir.resolve(originalImg.name)
             ImageIO.write(resizedImage, "jpg", newScaledFile)
 
             return newScaledFile
@@ -81,7 +81,7 @@ interface StorageService {
 
             for (scaleDir in scaleDirs) {
                 scaleDir.listFiles()
-                    ?.find { it.name == "$number.jpeg" }
+                    ?.find { it.name == file.name }
                     ?.delete()
             }
 
