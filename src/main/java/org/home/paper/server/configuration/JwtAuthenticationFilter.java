@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.home.paper.server.exceptions.TokenExpiredOrInvalid;
 import org.home.paper.server.service.JwtService;
 import org.home.paper.server.service.UserService;
 import org.springframework.lang.NonNull;
@@ -46,17 +47,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
             var context = SecurityContextHolder.createEmptyContext();
             var userDetails = userService.loadUserByUsername(username);
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                var token = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-
-                token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                context.setAuthentication(token);
-                SecurityContextHolder.setContext(context);
+            if (!jwtService.isTokenValid(jwt, userDetails)) {
+                throw new TokenExpiredOrInvalid();
             }
+
+            var token = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+            );
+
+            token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            context.setAuthentication(token);
+            SecurityContextHolder.setContext(context);
         }
         filterChain.doFilter(request, response);
     }
