@@ -1,6 +1,6 @@
 package org.home.paper.server.service;
 
-import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.io.Decoders;
@@ -37,12 +37,8 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        try {
-            var userName = extractUserName(token);
-            return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
-        } catch (Exception e) {
-            return false;
-        }
+        var userName = extractUserName(token);
+        return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -72,8 +68,12 @@ public class JwtService {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
-        Claims claims = extractAllClaims(token);
-        return claimsResolvers.apply(claims);
+        try {
+            Claims claims = extractAllClaims(token);
+            return claimsResolvers.apply(claims);
+        } catch (ExpiredJwtException ex) {
+            return claimsResolvers.apply(ex.getClaims());
+        }
     }
 
     private Claims extractAllClaims(String token) {
