@@ -1,5 +1,6 @@
 package org.home.paper.server.service;
 
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.io.Decoders;
@@ -36,8 +37,12 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        var userName = extractUserName(token);
-        return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        try {
+            var userName = extractUserName(token);
+            return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public String generateToken(UserDetails userDetails) {
