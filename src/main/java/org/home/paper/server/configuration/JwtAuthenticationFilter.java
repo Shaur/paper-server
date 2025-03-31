@@ -4,9 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.home.paper.server.exceptions.TokenExpiredOrInvalid;
 import org.home.paper.server.service.JwtService;
 import org.home.paper.server.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,7 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var context = SecurityContextHolder.createEmptyContext();
             var userDetails = userService.loadUserByUsername(username);
             if (!jwtService.isTokenValid(jwt, userDetails)) {
-                throw new TokenExpiredOrInvalid();
+                response.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase());
+                return;
             }
 
             var token = new UsernamePasswordAuthenticationToken(
