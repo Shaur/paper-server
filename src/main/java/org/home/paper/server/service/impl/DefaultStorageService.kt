@@ -1,6 +1,7 @@
 package org.home.paper.server.service.impl
 
 import org.home.paper.server.configuration.properties.StorageProperties
+import org.home.paper.server.dto.DiskStatsView
 import org.home.paper.server.service.StorageService
 import org.springframework.stereotype.Service
 import java.io.File
@@ -10,6 +11,10 @@ import java.nio.file.StandardCopyOption
 
 @Service
 class DefaultStorageService(properties: StorageProperties) : StorageService {
+
+    companion object {
+        private const val GB_DIV = 1073741824.0
+    }
 
     private val purgatoryDir = File(properties.purgatoryPath)
     private val issuesDir = File(properties.issuesPath)
@@ -40,6 +45,14 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
     }
 
     override fun resolvePurgatoryDir(id: Long): File = purgatoryDir.resolve(id.toString())
+
+    override fun diskInfo(): DiskStatsView {
+        return DiskStatsView(
+            total = issuesDir.totalSpace / GB_DIV,
+            usable = issuesDir.usableSpace / GB_DIV,
+            free = issuesDir.freeSpace / GB_DIV
+        )
+    }
 
     override val purgatory: StorageService.Storage = StorageService.Storage(purgatoryDir, purgatoryCacheDir)
 

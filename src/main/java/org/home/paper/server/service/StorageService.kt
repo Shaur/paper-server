@@ -1,5 +1,6 @@
 package org.home.paper.server.service
 
+import org.home.paper.server.dto.DiskStatsView
 import org.home.paper.server.dto.PageSize
 import org.home.paper.server.exceptions.FileNotFoundException
 import org.imgscalr.Scalr
@@ -16,6 +17,8 @@ interface StorageService {
     fun storePurgatoryArchive(source: InputStream, name: String): File
 
     fun resolvePurgatoryDir(id: Long): File
+
+    fun diskInfo(): DiskStatsView
 
     val purgatory: Storage
 
