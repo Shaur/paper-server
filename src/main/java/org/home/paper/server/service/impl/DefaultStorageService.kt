@@ -49,7 +49,7 @@ class DefaultStorageService(properties: StorageProperties) : StorageService {
     override fun diskInfo(): DiskStatsView {
         return DiskStatsView(
             total = issuesDir.totalSpace / GB_DIV,
-            usable = issuesDir.usableSpace / GB_DIV,
+            usable = (issuesDir.totalSpace - issuesDir.freeSpace) / GB_DIV,
             free = issuesDir.freeSpace / GB_DIV
         )
     }
