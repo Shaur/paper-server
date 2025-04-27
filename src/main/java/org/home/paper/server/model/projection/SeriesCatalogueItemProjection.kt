@@ -3,6 +3,7 @@ package org.home.paper.server.model.projection
 interface SeriesCatalogueItemProjection : BaseSeriesProjection {
     fun getPublisher(): String
     fun getMinIssueId(): Long?
+    fun getMaxIssueId(): Long?
     fun getIssuesCount(): Int
     fun getSubscribed(): Boolean
     fun getCompletedIssuesCount(): Int

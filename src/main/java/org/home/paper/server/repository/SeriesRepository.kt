@@ -35,6 +35,7 @@ interface SeriesRepository : CrudRepository<Series, Long> {
                 min(EXTRACT(YEAR FROM i.publication_date)) as minYear, 
                 max(EXTRACT(YEAR FROM i.publication_date)) as maxYear,
                 min(i.id) as minIssueId,
+                max(i.id) as maxIssueId,
                 count(i.id) as issuesCount,
                 exists (select 1 from series_subscription ss where ss.series_id = s.id and ss.user_id = :userId) as subscribed,
                 count(case when rp.current_page + 1 = i.pages_count then 1 end) as completedIssuesCount

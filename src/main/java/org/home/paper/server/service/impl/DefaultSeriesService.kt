@@ -58,7 +58,7 @@ class DefaultSeriesService(
             title = projection.title(),
             publisher = projection.getPublisher(),
             issuesCount = projection.getIssuesCount(),
-            cover = "/pages/${projection.getMinIssueId()}/0",
+            cover = "/pages/${projection.getMaxIssueId()}/0",
             completedIssuesCount = projection.getCompletedIssuesCount(),
             subscribed = projection.getSubscribed()
         )
