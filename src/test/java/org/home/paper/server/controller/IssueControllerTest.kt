@@ -12,6 +12,7 @@ import org.home.paper.server.repository.ReadingProgressRepository
 import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.repository.UserRepository
 import org.home.paper.server.service.JwtService
+import org.home.paper.server.service.UserService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional
 class IssueControllerTest @Autowired constructor(
     private val restTemplate: TestRestTemplate,
     private val userRepository: UserRepository,
+    private val userService: UserService,
     private val readingProgressRepository: ReadingProgressRepository,
     private val seriesRepository: SeriesRepository,
     private val issueRepository: IssueRepository,
@@ -52,11 +54,11 @@ class IssueControllerTest @Autowired constructor(
 
     @Test
     fun `new progress update`() {
-        val user = userRepository.save(unsavedUser)
+        val user = userService.create(unsavedUser)
         val series = seriesRepository.save(unsavedSeries)
         val issue = issueRepository.create(unsavedIssue(series.id!!))
 
-        val jwtToken = jwtService.generateToken(user)
+        val jwtToken = jwtService.generateToken(userService.loadUserByUsername(user.username))
 
         val updateBody = ReadingProgressUpdate(
             currentPage = 3,
@@ -77,7 +79,7 @@ class IssueControllerTest @Autowired constructor(
         val progress = readingProgressRepository.getReferenceById(ReadingProgressKey(user.id, issue.id!!))
         val expectedProgress = ReadingProgress(
             userId = user.id,
-            issueId = issue.id!!,
+            issueId = issue.id,
             currentPage = 3,
             updateTime = 40L
         )

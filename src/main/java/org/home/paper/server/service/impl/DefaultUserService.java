@@ -1,9 +1,10 @@
 package org.home.paper.server.service.impl;
 
-import org.home.paper.server.model.User;
+import org.home.paper.server.exceptions.ObjectNotFoundException;
+import org.home.paper.server.model.auth.User;
+import org.home.paper.server.repository.RoleRepository;
 import org.home.paper.server.repository.UserRepository;
 import org.home.paper.server.service.UserService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -11,18 +12,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class DefaultUserService implements UserService {
 
-    private final UserRepository repository;
+    private final UserRepository userRepository;
 
-    public DefaultUserService(UserRepository repository) {
-        this.repository = repository;
+    private final RoleRepository roleRepository;
+
+    public DefaultUserService(
+            UserRepository userRepository,
+            RoleRepository roleRepository
+    ) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     public User save(User user) {
-        return repository.save(user);
+        return userRepository.save(user);
     }
 
     public User create(User user) {
-        if (repository.existsByUsername(user.getUsername())) {
+        if (userRepository.existsByUsername(user.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
 
@@ -30,17 +37,18 @@ public class DefaultUserService implements UserService {
     }
 
     public User getByUsername(String username) {
-        return repository.findByUsername(username)
+        return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
-
-    public User getCurrentUser() {
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        return getByUsername(name);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return this.getByUsername(username);
+        var user = getByUsername(username);
+        var role = roleRepository.findByName(user.getRole());
+        if (role == null) {
+            throw new ObjectNotFoundException("Role", user.getRole());
+        }
+
+        return user.toSecure().withPrivileges(role.getPrivileges());
     }
 }

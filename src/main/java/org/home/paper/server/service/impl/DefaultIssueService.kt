@@ -7,7 +7,7 @@ import org.home.paper.server.exceptions.IllegalStateException
 import org.home.paper.server.model.Issue
 import org.home.paper.server.model.ReadingProgress
 import org.home.paper.server.model.ReadingProgressKey
-import org.home.paper.server.model.User
+import org.home.paper.server.model.auth.AuthentificationEntity
 import org.home.paper.server.repository.IssueRepository
 import org.home.paper.server.repository.ReadingProgressRepository
 import org.home.paper.server.service.IssueService
@@ -31,7 +31,7 @@ class DefaultIssueService(
             throw IllegalStateException(PAGES_COUNT_VIOLATION_MESSAGE)
         }
 
-        val user = (SecurityContextHolder.getContext().authentication.principal as User)
+        val user = (SecurityContextHolder.getContext().authentication.principal as AuthentificationEntity)
 
         val progressOptional = readingProgressRepository.findById(ReadingProgressKey(user.id, id))
         if (progressOptional.isEmpty) {
@@ -44,10 +44,10 @@ class DefaultIssueService(
     }
 
     override fun get(id: Long): IssueView {
-        val user = (SecurityContextHolder.getContext().authentication.principal as User)
-        val userId = user.id
+        val user = (SecurityContextHolder.getContext().authentication.principal as AuthentificationEntity)
+
         val issue = issueRepository.getById(id) ?: throw ObjectNotFoundException(Issue::class.toString(), id)
-        val readingProgress = readingProgressRepository.findById(ReadingProgressKey(userId, id))
+        val readingProgress = readingProgressRepository.findById(ReadingProgressKey(user.id, id))
 
         return IssueView(
             id = issue.id!!,
@@ -61,11 +61,10 @@ class DefaultIssueService(
     }
 
     override fun getBySeriesId(seriesId: Long): List<IssueView> {
-        val user = (SecurityContextHolder.getContext().authentication.principal as User)
-        val userId = user.id
+        val user = (SecurityContextHolder.getContext().authentication.principal as AuthentificationEntity)
 
         val issues = issueRepository.getBySeriesId(seriesId)
-        val keys = issues.mapNotNull { it.id }.map { ReadingProgressKey(userId, it) }
+        val keys = issues.mapNotNull { it.id }.map { ReadingProgressKey(user.id, it) }
         val readingHistory = readingProgressRepository.findAllById(keys).associateBy { it.issueId }
 
         return issues.map {

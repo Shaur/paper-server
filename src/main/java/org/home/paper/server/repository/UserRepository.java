@@ -1,6 +1,6 @@
 package org.home.paper.server.repository;
 
-import org.home.paper.server.model.User;
+import org.home.paper.server.model.auth.User;
 
 import java.util.Optional;
 

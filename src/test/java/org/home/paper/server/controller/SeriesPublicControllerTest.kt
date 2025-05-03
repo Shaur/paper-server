@@ -2,10 +2,11 @@ package org.home.paper.server.controller
 
 import org.assertj.core.api.Assertions.assertThat
 import org.home.paper.server.Application
+import org.home.paper.server.Dummies.unsavedUser
 import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.model.Series
 import org.home.paper.server.model.SeriesSubscription
-import org.home.paper.server.model.User
+import org.home.paper.server.model.auth.User
 import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.repository.SeriesSubscriptionRepository
 import org.home.paper.server.repository.UserRepository
@@ -56,10 +57,17 @@ class SeriesPublicControllerTest {
 
     @Test
     fun `series subscribe test`() {
-        val user = userRepository.save(User(null, "user", "password"))
+        val user = userRepository.save(
+            User(
+                null,
+                "user",
+                "password",
+                "user"
+            )
+        )
         val series = seriesRepository.save(Series(null, "test", "someone"))
 
-        val jwtToken = jwtService.generateToken(user)
+        val jwtToken = jwtService.generateToken(user.toSecure())
 
         val headers = HttpHeaders()
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
@@ -79,9 +87,9 @@ class SeriesPublicControllerTest {
 
     @Test
     fun `unsubscribe series test`() {
-        val user = userRepository.save(User(null, "user", "password"))
+        val user = userRepository.save(unsavedUser)
         val series = seriesRepository.save(Series(null, "test", "someone"))
-        val jwtToken = jwtService.generateToken(user)
+        val jwtToken = jwtService.generateToken(user.toSecure())
 
         subscriptionRepository.save(SeriesSubscription(user.id, series.id!!))
         var subscriptions = subscriptionRepository.getByUserId(user.id)
@@ -103,9 +111,9 @@ class SeriesPublicControllerTest {
 
     @Test
     fun `find unsubscribed series`(){
-        val user = userRepository.save(User(null, "user", "password"))
+        val user = userRepository.save(unsavedUser)
         val series = seriesRepository.save(Series(null, "test", "someone"))
-        val jwtToken = jwtService.generateToken(user)
+        val jwtToken = jwtService.generateToken(user.toSecure())
 
         val headers = HttpHeaders()
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
@@ -127,10 +135,10 @@ class SeriesPublicControllerTest {
 
     @Test
     fun `find subscribed series`(){
-        val user = userRepository.save(User(null, "user", "password"))
+        val user = userRepository.save(unsavedUser)
         val series = seriesRepository.save(Series(null, "test", "someone"))
         subscriptionRepository.save(SeriesSubscription(user.id, series.id!!))
-        val jwtToken = jwtService.generateToken(user)
+        val jwtToken = jwtService.generateToken(user.toSecure())
 
         val headers = HttpHeaders()
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")

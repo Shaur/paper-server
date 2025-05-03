@@ -2,12 +2,12 @@ package org.home.paper.server
 
 import org.home.paper.server.model.Issue
 import org.home.paper.server.model.Series
-import org.home.paper.server.model.User
+import org.home.paper.server.model.auth.User
 import java.util.*
 
 object Dummies {
 
-    val unsavedUser = User(null, "user", "password")
+    val unsavedUser = User(null, "user", "password", "user")
     val unsavedSeries = Series(null, "test", "someone")
 
 

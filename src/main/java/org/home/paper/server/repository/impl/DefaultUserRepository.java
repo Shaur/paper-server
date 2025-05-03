@@ -2,13 +2,11 @@ package org.home.paper.server.repository.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.home.paper.server.model.User;
+import org.home.paper.server.model.auth.User;
 import org.home.paper.server.repository.UserRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -16,8 +14,6 @@ public class DefaultUserRepository implements UserRepository {
 
     private final JdbcTemplate template;
     private final EntityManager entityManager;
-
-    private static final Map<String, User> users = new HashMap<>();
 
     public DefaultUserRepository(JdbcTemplate jdbcTemplate, EntityManager entityManager) {
         this.template = jdbcTemplate;
@@ -43,7 +39,7 @@ public class DefaultUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        var rows = template.queryForList("select * from user_data where username = ?", username);
+        var rows = template.queryForList("select * from user_data ud left join user_role ur on ud.role = ur.name where ud.username = ?", username);
 
         if (rows.isEmpty()) return Optional.empty();
 
@@ -51,7 +47,8 @@ public class DefaultUserRepository implements UserRepository {
         var user = new User(
                 (Long) row.get("id"),
                 (String) row.get("username"),
-                (String) row.get("password")
+                (String) row.get("password"),
+                (String) row.get("role")
         );
 
         return Optional.of(user);
