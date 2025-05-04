@@ -63,7 +63,7 @@ class DefaultPurgatoryService(
             publicationDate = issueUpdate.publicationDate
         )
 
-        val savedIssue = issueRepository.create(issue)
+        val savedIssue = issueRepository.save(issue)
 
         storageService.transfer(purgatoryId, savedIssue.id!!)
 

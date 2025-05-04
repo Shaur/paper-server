@@ -12,7 +12,7 @@ class DefaultIssueRepository(
 ) : IssueRepository {
 
     @Transactional
-    override fun create(issue: Issue): Issue {
+    override fun save(issue: Issue): Issue {
         return entityManager.merge(issue)
     }
 
@@ -26,6 +26,12 @@ class DefaultIssueRepository(
     override fun getBySeriesId(seriesId: Long): List<Issue> {
         return entityManager.createQuery("select i from issue i where i.seriesId = :seriesId", Issue::class.java)
             .setParameter("seriesId", seriesId)
+            .resultList
+    }
+
+    override fun getBySeriesIds(seriesIds: Collection<Long>): List<Issue> {
+        return entityManager.createQuery("select i from issue i where i.seriesId in (:seriesIds)", Issue::class.java)
+            .setParameter("seriesIds", seriesIds)
             .resultList
     }
 

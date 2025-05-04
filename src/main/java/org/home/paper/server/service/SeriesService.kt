@@ -14,4 +14,6 @@ interface SeriesService {
     fun unsubscribe(seriesId: Long)
 
     fun get(id: Long): SeriesCatalogItemView
+
+    fun merge(ids: List<Long>)
 }

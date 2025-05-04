@@ -7,16 +7,19 @@ import org.home.paper.server.extensions.entity
 import org.home.paper.server.extensions.title
 import org.home.paper.server.model.SeriesSubscription
 import org.home.paper.server.model.projection.SeriesCatalogueItemProjection
+import org.home.paper.server.repository.IssueRepository
 import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.repository.SeriesSubscriptionRepository
 import org.home.paper.server.service.SeriesService
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class DefaultSeriesService(
-    private val repository: SeriesRepository,
+    private val seriesRepository: SeriesRepository,
+    private val issueRepository: IssueRepository,
     private val subscriptionRepository: SeriesSubscriptionRepository
 ) : SeriesService {
 
@@ -25,7 +28,7 @@ class DefaultSeriesService(
         limit: Int,
         offset: Int
     ): List<SeriesAutocompletionView> {
-        return repository.findForAutocompletion(titlePart, PageRequest.of(offset, limit))
+        return seriesRepository.findForAutocompletion(titlePart, PageRequest.of(offset, limit))
             .map {
                 SeriesAutocompletionView(it.getId(), it.title())
             }
@@ -33,7 +36,7 @@ class DefaultSeriesService(
 
     override fun find(limit: Int, pageNumber: Int): List<SeriesCatalogItemView> {
         val user = SecurityContextHolder.getContext().entity()
-        return repository.find(user.id, PageRequest.of(pageNumber, limit)).map(::converter)
+        return seriesRepository.find(user.id, PageRequest.of(pageNumber, limit)).map(::converter)
     }
 
     override fun subscribe(seriesId: Long) {
@@ -48,8 +51,21 @@ class DefaultSeriesService(
 
     override fun get(id: Long): SeriesCatalogItemView {
         val user = SecurityContextHolder.getContext().entity()
-        val projection = repository.getById(id, user.id) ?: throw ObjectNotFoundException("Series", id)
+        val projection = seriesRepository.getById(id, user.id) ?: throw ObjectNotFoundException("Series", id)
         return converter(projection)
+    }
+
+    @Transactional
+    override fun merge(ids: List<Long>) {
+        val oldestId = ids.min()
+        val seriesForRemove = ids - oldestId
+
+        val issues = issueRepository.getBySeriesIds(seriesForRemove)
+        for (issue in issues) {
+            issueRepository.save(issue.copy(seriesId = oldestId))
+        }
+
+        seriesRepository.deleteAllById(seriesForRemove)
     }
 
     private fun converter(projection: SeriesCatalogueItemProjection): SeriesCatalogItemView {

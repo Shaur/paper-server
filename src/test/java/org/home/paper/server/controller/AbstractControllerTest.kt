@@ -22,6 +22,10 @@ open class AbstractControllerTest(
         return jwtService.generateToken(user.toSecure())
     }
 
+    fun getUser(): User {
+        return context.getValue(USER) as User
+    }
+
     companion object {
         const val USER = "user"
     }

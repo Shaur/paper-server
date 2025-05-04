@@ -2,6 +2,7 @@ package org.home.paper.server.controller
 
 import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
+import org.home.paper.server.dto.SeriesMergeRequest
 import org.home.paper.server.service.IssueService
 import org.home.paper.server.service.SeriesService
 import org.springframework.web.bind.annotation.*
@@ -46,6 +47,11 @@ class SeriesPublicController(
     @PutMapping("/{id}/unsubscribe")
     fun unsubscribe(@PathVariable id: Long) {
         seriesService.unsubscribe(id)
+    }
+
+    @PutMapping("/merge")
+    fun merge(@RequestBody body: SeriesMergeRequest) {
+        seriesService.merge(body.ids)
     }
 
 }

@@ -56,7 +56,7 @@ class IssueControllerTest @Autowired constructor(
     fun `new progress update`() {
         val user = userService.create(unsavedUser)
         val series = seriesRepository.save(unsavedSeries)
-        val issue = issueRepository.create(unsavedIssue(series.id!!))
+        val issue = issueRepository.save(unsavedIssue(series.id!!))
 
         val jwtToken = jwtService.generateToken(userService.loadUserByUsername(user.username))
 

@@ -14,6 +14,4 @@ create table if not exists issue
     publication_date timestamp(6),
     summary          text,
     series_id        bigserial
-        constraint issue_fk
-            references series
 );

@@ -4,11 +4,13 @@ import org.home.paper.server.model.Issue
 
 interface IssueRepository {
 
-    fun create(issue: Issue): Issue
+    fun save(issue: Issue): Issue
 
     fun getById(id: Long): Issue?
 
     fun getBySeriesId(seriesId: Long): List<Issue>
+
+    fun getBySeriesIds(seriesIds: Collection<Long>): List<Issue>
 
     fun deleteAll()
 }
