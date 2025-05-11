@@ -19,4 +19,7 @@ class IssueController(
 
     @GetMapping("/{id}")
     fun get(@PathVariable id: Long) = service.get(id)
+
+    @DeleteMapping("/{id}")
+    fun delete(@PathVariable id: Long) = service.delete(id)
 }

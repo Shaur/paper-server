@@ -2,6 +2,7 @@ package org.home.paper.server.controller
 
 import org.assertj.core.api.Assertions.assertThat
 import org.home.paper.server.Application
+import org.home.paper.server.Dummies.unsavedAdmin
 import org.home.paper.server.Dummies.unsavedIssue
 import org.home.paper.server.Dummies.unsavedSeries
 import org.home.paper.server.Dummies.unsavedUser
@@ -85,6 +86,46 @@ class IssueControllerTest @Autowired constructor(
         )
 
         assertThat(progress).isEqualTo(expectedProgress)
+    }
+
+    @Test
+    fun `delete issue without permission`() {
+        val user = userService.create(unsavedUser)
+        val series = seriesRepository.save(unsavedSeries)
+        val issue = issueRepository.save(unsavedIssue(series.id!!))
+
+        val jwtToken = jwtService.generateToken(userService.loadUserByUsername(user.username))
+
+        val headers = HttpHeaders()
+        headers.setBearerAuth(jwtToken)
+
+        val response = restTemplate.exchange<Void>(
+            "/issue/${issue.id}",
+            HttpMethod.DELETE,
+            HttpEntity(null, headers)
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+    }
+
+    @Test
+    fun `delete issue`() {
+        val user = userService.create(unsavedAdmin)
+        val series = seriesRepository.save(unsavedSeries)
+        val issue = issueRepository.save(unsavedIssue(series.id!!))
+
+        val jwtToken = jwtService.generateToken(userService.loadUserByUsername(user.username))
+
+        val headers = HttpHeaders()
+        headers.setBearerAuth(jwtToken)
+
+        val response = restTemplate.exchange<Void>(
+            "/issue/${issue.id}",
+            HttpMethod.DELETE,
+            HttpEntity(null, headers)
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
     }
 
     object Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {

@@ -36,7 +36,8 @@ class DefaultSeriesService(
 
     override fun find(limit: Int, pageNumber: Int): List<SeriesCatalogItemView> {
         val user = SecurityContextHolder.getContext().entity()
-        return seriesRepository.find(user.id, PageRequest.of(pageNumber, limit)).map(::converter)
+        return seriesRepository.find(user.id, PageRequest.of(pageNumber, limit))
+            .map(::converter)
     }
 
     override fun subscribe(seriesId: Long) {

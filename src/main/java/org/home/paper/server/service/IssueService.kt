@@ -11,4 +11,6 @@ interface IssueService {
 
     fun get(id: Long): IssueView
 
+    fun delete(id: Long)
+
 }

@@ -13,4 +13,6 @@ interface IssueRepository {
     fun getBySeriesIds(seriesIds: Collection<Long>): List<Issue>
 
     fun deleteAll()
+
+    fun delete(id: Long)
 }

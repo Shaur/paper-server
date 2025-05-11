@@ -40,5 +40,12 @@ class DefaultIssueRepository(
         entityManager.createQuery("delete from issue").executeUpdate()
     }
 
+    @Transactional
+    override fun delete(id: Long) {
+        entityManager.createQuery("delete from issue where id = :id")
+            .setParameter("id", id)
+            .executeUpdate()
+    }
+
 
 }

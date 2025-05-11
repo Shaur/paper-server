@@ -11,6 +11,7 @@ import org.home.paper.server.model.auth.AuthentificationEntity
 import org.home.paper.server.repository.IssueRepository
 import org.home.paper.server.repository.ReadingProgressRepository
 import org.home.paper.server.service.IssueService
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
@@ -58,6 +59,11 @@ class DefaultIssueService(
             currentPage = readingProgress.getOrNull()?.currentPage ?: 0,
             publicationDate = issue.publicationDate
         )
+    }
+
+    @PreAuthorize("hasAuthority('issue.delete')")
+    override fun delete(id: Long) {
+        issueRepository.delete(id)
     }
 
     override fun getBySeriesId(seriesId: Long): List<IssueView> {
