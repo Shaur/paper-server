@@ -1,12 +1,15 @@
 package org.home.paper.server.controller
 
+import jakarta.persistence.EntityManager
 import org.assertj.core.api.Assertions.assertThat
 import org.home.paper.server.Application
+import org.home.paper.server.Dummies.unsavedSeries
 import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.dto.SeriesMergeRequest
 import org.home.paper.server.model.Issue
 import org.home.paper.server.model.Series
 import org.home.paper.server.model.SeriesSubscription
+import org.home.paper.server.put
 import org.home.paper.server.repository.IssueRepository
 import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.repository.SeriesSubscriptionRepository
@@ -16,83 +19,74 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.exchange
-import org.springframework.context.ApplicationContextInitializer
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.transaction.annotation.Propagation
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 import java.util.*
 
 @SpringBootTest(
     classes = [Application::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-@ContextConfiguration(initializers = [SeriesPublicControllerTest.Initializer::class])
 class SeriesPublicControllerTest @Autowired constructor(
     userRepository: UserRepository,
     jwtService: JwtService,
     private val restTemplate: TestRestTemplate,
     private val seriesRepository: SeriesRepository,
     private val issueRepository: IssueRepository,
-    private val subscriptionRepository: SeriesSubscriptionRepository
+    private val subscriptionRepository: SeriesSubscriptionRepository,
+    private val entityManager: EntityManager,
+    private val transactionTemplate: TransactionTemplate
 ) : AbstractControllerTest(userRepository, jwtService) {
 
     @AfterEach
-    @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
     fun afterEach() {
-        userRepository.deleteAll()
-        seriesRepository.deleteAll()
-        issueRepository.deleteAll()
-        subscriptionRepository.deleteAll()
+        val tables = listOf("user_data", "series", "issue", "series_subscription")
+            .joinToString(", ")
+
+        transactionTemplate.executeWithoutResult {
+            entityManager.createNativeQuery("truncate table $tables").executeUpdate()
+            entityManager.clear()
+        }
     }
 
     @Test
-    fun `series subscribe test`() {
+    fun `series subscribe`() {
         createUser()
-        val jwtToken = generateToken()
 
-        val series = seriesRepository.save(Series(null, "test", "someone"))
+        val series = seriesRepository.save(unsavedSeries)
 
-        val headers = HttpHeaders()
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
-
-        val response = restTemplate.exchange<Void>(
+        val response = restTemplate.put<Void>(
             "/series/${series.id}/subscribe",
-            HttpMethod.PUT,
-            HttpEntity(null, headers),
+            entity = (null to authHeaders())
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
 
         val subscriptions = subscriptionRepository.getByUserId(getUser().id)
-        assertThat(subscriptions).hasSize(1)
-        assertThat(subscriptions.first()).isEqualTo(SeriesSubscription(getUser().id, series.id!!))
+        assertThat(subscriptions)
+            .hasSize(1)
+            .first()
+            .isEqualTo(SeriesSubscription(getUser().id, series.id!!))
     }
 
     @Test
-    fun `unsubscribe series test`() {
+    fun `unsubscribe series`() {
         createUser()
-        val series = seriesRepository.save(Series(null, "test", "someone"))
-        val jwtToken = generateToken()
+
+        val series = seriesRepository.save(unsavedSeries)
 
         subscriptionRepository.save(SeriesSubscription(getUser().id, series.id!!))
+
         var subscriptions = subscriptionRepository.getByUserId(getUser().id)
         assertThat(subscriptions).hasSize(1)
 
-        val headers = HttpHeaders()
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
-
-        val response = restTemplate.exchange<Void>(
+        val response = restTemplate.put<Void>(
             "/series/${series.id}/unsubscribe",
-            HttpMethod.PUT,
-            HttpEntity(null, headers),
+            entity = null to authHeaders()
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -103,16 +97,13 @@ class SeriesPublicControllerTest @Autowired constructor(
     @Test
     fun `find unsubscribed series`() {
         createUser()
-        val series = seriesRepository.save(Series(null, "test", "someone"))
-        val jwtToken = generateToken()
 
-        val headers = HttpHeaders()
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
+        val series = seriesRepository.save(Series(null, "test", "someone"))
 
         val response = restTemplate.exchange<List<SeriesCatalogItemView>>(
             "/series",
             HttpMethod.GET,
-            HttpEntity(null, headers),
+            HttpEntity(null, authHeaders()),
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -127,17 +118,14 @@ class SeriesPublicControllerTest @Autowired constructor(
     @Test
     fun `find subscribed series`() {
         createUser()
+
         val series = seriesRepository.save(Series(null, "test", "someone"))
         subscriptionRepository.save(SeriesSubscription(getUser().id, series.id!!))
-        val jwtToken = generateToken()
-
-        val headers = HttpHeaders()
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer $jwtToken")
 
         val response = restTemplate.exchange<List<SeriesCatalogItemView>>(
             "/series",
             HttpMethod.GET,
-            HttpEntity(null, headers),
+            HttpEntity(null, authHeaders()),
         )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -173,15 +161,13 @@ class SeriesPublicControllerTest @Autowired constructor(
             )
         )
 
-        val headers = HttpHeaders()
-        headers.setBearerAuth(generateToken())
-
         val request = SeriesMergeRequest(listOf(series1.id, series2.id))
 
-        restTemplate.exchange<Void>(
+        val headers = authHeaders()
+
+        restTemplate.put<Void>(
             "/series/merge",
-            HttpMethod.PUT,
-            HttpEntity(request, headers),
+            entity = (request to headers),
         )
 
         val actual = restTemplate.exchange<List<SeriesCatalogItemView>>(
@@ -197,17 +183,11 @@ class SeriesPublicControllerTest @Autowired constructor(
             id = series1.id,
             title = "${series1.title} (${Calendar.getInstance().get(Calendar.YEAR)})",
             issuesCount = 2,
-            publisher =  series1.publisher,
+            publisher = series1.publisher,
             cover = "/pages/${issue2.id}/0"
         )
 
         assertThat(actual.body).isEqualTo(listOf(expectedView))
-    }
-
-    object Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
-        override fun initialize(configurableApplicationContext: ConfigurableApplicationContext) {
-            TestPropertyValues.of().applyTo(configurableApplicationContext.environment)
-        }
     }
 
 }

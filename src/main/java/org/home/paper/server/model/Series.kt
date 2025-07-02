@@ -13,5 +13,8 @@ data class Series(
 
     val publisher: String,
 
-    val isEnded: Boolean = false
+    val isEnded: Boolean = false,
+
+    @Version
+    val version: Long = 0
 )

@@ -50,4 +50,23 @@ class ReadingProgress(
     }
 }
 
-class ReadingProgressKey(val userId: Long = 0, val issueId: Long = 0)
+class ReadingProgressKey(val userId: Long = 0, val issueId: Long = 0) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ReadingProgressKey
+
+        if (userId != other.userId) return false
+        if (issueId != other.issueId) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = userId.hashCode()
+        result = 31 * result + issueId.hashCode()
+        return result
+    }
+}
