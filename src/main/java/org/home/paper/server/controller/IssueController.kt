@@ -1,5 +1,6 @@
 package org.home.paper.server.controller
 
+import org.home.paper.server.dto.IssueUpdateRequest
 import org.home.paper.server.dto.ReadingProgressUpdate
 import org.home.paper.server.service.IssueService
 import org.springframework.web.bind.annotation.*
@@ -22,4 +23,9 @@ class IssueController(
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long) = service.delete(id)
+
+    @PutMapping("/{id}")
+    fun update(@PathVariable id: Long, @RequestBody body: IssueUpdateRequest) {
+        service.update(id, body)
+    }
 }

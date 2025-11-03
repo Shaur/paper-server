@@ -69,4 +69,6 @@ interface SeriesRepository : CrudRepository<Series, Long> {
         """
     )
     fun getById(id: Long, userId: Long): SeriesCatalogueItemProjection?
+
+    fun getById(id: Long): Series?
 }

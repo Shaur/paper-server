@@ -41,7 +41,7 @@ abstract class ArchiveTool(protected val fileName: String) {
             return fileName
         }
 
-        return nameWithNumber.substring(0, lastIndexOfSpace).trim()
+        return nameWithNumber.take(lastIndexOfSpace).trim()
     }
 
     protected fun extractMetaFromXml(xmlFile: File): ArchiveMeta {
@@ -84,7 +84,7 @@ abstract class ArchiveTool(protected val fileName: String) {
             return ""
         }
 
-        var number = substring.substring(0, indexOfSpace).trim()
+        var number = substring.take(indexOfSpace).trim()
         number = NUMBER_REGEX.find(number)?.value ?: ""
 
         return (number.toIntOrNull() ?: number.toDoubleOrNull() ?: number).toString()

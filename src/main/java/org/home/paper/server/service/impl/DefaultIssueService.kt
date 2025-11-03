@@ -1,5 +1,6 @@
 package org.home.paper.server.service.impl
 
+import org.home.paper.server.dto.IssueUpdateRequest
 import org.home.paper.server.dto.IssueView
 import org.home.paper.server.dto.ReadingProgressUpdate
 import org.home.paper.server.exceptions.ObjectNotFoundException
@@ -64,6 +65,16 @@ class DefaultIssueService(
     @PreAuthorize("hasAuthority('issue.delete')")
     override fun delete(id: Long) {
         issueRepository.delete(id)
+    }
+
+    override fun update(id: Long, body: IssueUpdateRequest) {
+        val issue = issueRepository.getById(id) ?: throw ObjectNotFoundException(Issue::class.toString(), id)
+
+        val updatedIssue = issue.copy(
+            number = body.number
+        )
+
+        issueRepository.save(updatedIssue)
     }
 
     override fun getBySeriesId(seriesId: Long): List<IssueView> {

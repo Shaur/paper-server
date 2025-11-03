@@ -1,4 +1,4 @@
-alter table user_data add role varchar(255);
+alter table user_data add column if not exists role varchar(255);
 
 update user_data set role='user';
 

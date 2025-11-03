@@ -3,6 +3,7 @@ package org.home.paper.server.controller
 import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.dto.SeriesMergeRequest
+import org.home.paper.server.dto.SeriesUpdateRequest
 import org.home.paper.server.service.IssueService
 import org.home.paper.server.service.SeriesService
 import org.springframework.web.bind.annotation.*
@@ -54,4 +55,8 @@ class SeriesPublicController(
         seriesService.merge(body.ids)
     }
 
+    @PutMapping("/{id}")
+    fun update(@PathVariable("id") id: Long, @RequestBody update: SeriesUpdateRequest) {
+seriesService.update(id, update)
+    }
 }

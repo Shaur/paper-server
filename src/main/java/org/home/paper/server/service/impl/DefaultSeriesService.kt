@@ -2,6 +2,7 @@ package org.home.paper.server.service.impl
 
 import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
+import org.home.paper.server.dto.SeriesUpdateRequest
 import org.home.paper.server.exceptions.ObjectNotFoundException
 import org.home.paper.server.extensions.entity
 import org.home.paper.server.extensions.title
@@ -67,6 +68,12 @@ class DefaultSeriesService(
         }
 
         seriesRepository.deleteAllById(seriesForRemove)
+    }
+
+    override fun update(id: Long, update: SeriesUpdateRequest) {
+        val series = seriesRepository.getById(id) ?: throw ObjectNotFoundException("Series", id)
+        val updatedSeries = series.copy(isEnded = update.ended)
+        seriesRepository.save(updatedSeries)
     }
 
     private fun converter(projection: SeriesCatalogueItemProjection): SeriesCatalogItemView {

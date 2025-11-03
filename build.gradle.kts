@@ -1,11 +1,11 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.4.1"
-    id("org.jetbrains.kotlin.plugin.spring") version "2.1.20"
-    id("org.jetbrains.kotlin.plugin.jpa") version "2.1.20"
-    id("io.spring.dependency-management") version "1.1.6"
+    id("org.springframework.boot") version "3.5.5"
+    id("org.jetbrains.kotlin.plugin.spring") version "2.2.20"
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.2.20"
+    id("io.spring.dependency-management") version "1.1.7"
     id("org.flywaydb.flyway") version "10.17.1"
-    id("org.jetbrains.kotlin.plugin.noarg") version "2.1.20"
+    id("org.jetbrains.kotlin.plugin.noarg") version "2.2.20"
 
     kotlin("jvm")
 }
@@ -29,7 +29,7 @@ repositories {
     mavenCentral()
 }
 
-val mockitoAgent = configurations.create("mockitoAgent")
+val mockitoAgent: Configuration = configurations.create("mockitoAgent")
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -47,6 +47,8 @@ dependencies {
 
     implementation("com.github.junrar:junrar:7.5.5")
     implementation("org.apache.commons:commons-text:1.12.0")
+
+    implementation("com.squareup.okhttp3:okhttp:5.2.1")
 
     implementation(kotlin("stdlib"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

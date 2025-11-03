@@ -2,6 +2,7 @@ package org.home.paper.server.service
 
 import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
+import org.home.paper.server.dto.SeriesUpdateRequest
 
 interface SeriesService {
 
@@ -16,4 +17,6 @@ interface SeriesService {
     fun get(id: Long): SeriesCatalogItemView
 
     fun merge(ids: List<Long>)
+
+    fun update(id: Long, update: SeriesUpdateRequest)
 }
