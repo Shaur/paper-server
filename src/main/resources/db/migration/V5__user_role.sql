@@ -12,4 +12,4 @@ create table if not exists user_role
 insert into user_role (name, privileges) values ('user', '[]');
 insert into user_role (name, privileges) values ('admin', '["issue.delete", "series.delete"]');
 
-create index idx_series_id on issue(series_id);
+create index if not exists idx_series_id on issue(series_id);
