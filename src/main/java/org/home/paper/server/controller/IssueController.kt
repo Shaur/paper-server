@@ -24,7 +24,7 @@ class IssueController(
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: Long) = service.delete(id)
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     fun update(@PathVariable id: Long, @RequestBody body: IssueUpdateRequest) {
         service.update(id, body)
     }
