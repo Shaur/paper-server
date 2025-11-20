@@ -7,5 +7,6 @@ data class SeriesCatalogItemView(
     val issuesCount: Int,
     val cover: String,
     val completedIssuesCount: Int = 0,
+    val ended: Boolean,
     val subscribed: Boolean = false
 )

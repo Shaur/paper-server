@@ -7,4 +7,5 @@ interface SeriesCatalogueItemProjection : BaseSeriesProjection {
     fun getIssuesCount(): Int
     fun getSubscribed(): Boolean
     fun getCompletedIssuesCount(): Int
+    fun getIsEnded(): Boolean
 }

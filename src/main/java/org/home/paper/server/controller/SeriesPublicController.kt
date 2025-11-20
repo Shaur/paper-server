@@ -57,6 +57,6 @@ class SeriesPublicController(
 
     @PutMapping("/{id}")
     fun update(@PathVariable("id") id: Long, @RequestBody update: SeriesUpdateRequest) {
-seriesService.update(id, update)
+        seriesService.update(id, update)
     }
 }

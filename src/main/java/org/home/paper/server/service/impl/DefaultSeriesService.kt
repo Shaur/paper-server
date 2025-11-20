@@ -31,7 +31,7 @@ class DefaultSeriesService(
     ): List<SeriesAutocompletionView> {
         return seriesRepository.findForAutocompletion(titlePart, PageRequest.of(offset, limit))
             .map {
-                SeriesAutocompletionView(it.getId(), it.title())
+                SeriesAutocompletionView(it.getId(), it.title(), it.getIsEnded())
             }
     }
 
@@ -84,6 +84,7 @@ class DefaultSeriesService(
             issuesCount = projection.getIssuesCount(),
             cover = "/pages/${projection.getMaxIssueId()}/0",
             completedIssuesCount = projection.getCompletedIssuesCount(),
+            ended = projection.getIsEnded(),
             subscribed = projection.getSubscribed()
         )
     }
