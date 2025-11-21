@@ -40,7 +40,7 @@ interface SeriesRepository : CrudRepository<Series, Long> {
                 count(i.id) as issuesCount,
                 exists (select 1 from series_subscription ss where ss.series_id = s.id and ss.user_id = :userId) as subscribed,
                 count(case when rp.current_page + 1 = i.pages_count then 1 end) as completedIssuesCount,
-                s.isEnded as isEnded
+                s.is_ended as isEnded
             from series s 
                 left join issue i on i.series_id = s.id
                 left join reading_progress rp on (rp.issue_id = i.id and rp.user_id = :userId)
