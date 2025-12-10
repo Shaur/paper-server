@@ -1,0 +1,38 @@
+services:
+  paper-postgres:
+    image: postgres:16.4-alpine
+    container_name: paper-postgres
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "5432:5432"
+  paper-server:
+    image: warehouse.webhop.me/paper-service:latest
+    container_name: paper-server
+    environment:
+      SPRING_FLYWAY_URL: "jdbc:postgresql://paper-postgres:5432/paper"
+      SPRING_FLYWAY_USER: "postgres"
+      SPRING_FLYWAY_PASSWORD: "example"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://paper-postgres:5432/paper"
+      SPRING_DATASOURCE_USERNAME: "postgres"
+      SPRING_DATASOURCE_PASSWORD: "example"
+    ports:
+      - "8081:8080"
+  paper-purgatory:
+    image: warehouse.webhop.me/paper-purgatory:latest
+    container_name: paper-purgatory
+    environment:
+      POSTGRES_HOST: "paper-postgres"
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "example"
+      POSTGRES_DATABASE: "paper"
+    ports:
+      - "8082:8080"
+  nginx:
+    image: nginx:1.29.3-alpine
+    container_name: paper-nginx
+    volumes:
+      - "./nginx.conf:/etc/nginx/conf.d/default.conf"
+    ports:
+      - "8084:80"

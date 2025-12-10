@@ -24,7 +24,7 @@ class DefaultIssueRepository(
     }
 
     override fun getBySeriesId(seriesId: Long): List<Issue> {
-        return entityManager.createQuery("select i from issue i where i.seriesId = :seriesId", Issue::class.java)
+        return entityManager.createQuery("select i from issue i where i.seriesId = :seriesId order by i.publicationDate", Issue::class.java)
             .setParameter("seriesId", seriesId)
             .resultList
     }
