@@ -18,7 +18,9 @@ interface SeriesRepository : CrudRepository<Series, Long> {
                 s.title as title, 
                 s.isEnded as isEnded,
                 min(EXTRACT(YEAR FROM i.publicationDate)) as minYear, 
-                max(EXTRACT(YEAR FROM i.publicationDate)) as maxYear
+                max(EXTRACT(YEAR FROM i.publicationDate)) as maxYear,
+                min(i.publicationDate) as firstPublication,
+                max(i.publicationDate) as lastPublication
             from series s
                 left join issue i on i.seriesId = s.id
                 where s.title like :titlePart

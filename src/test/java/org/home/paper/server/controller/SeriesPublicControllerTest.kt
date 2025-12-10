@@ -184,7 +184,8 @@ class SeriesPublicControllerTest @Autowired constructor(
             title = "${series1.title} (${Calendar.getInstance().get(Calendar.YEAR)})",
             issuesCount = 2,
             publisher = series1.publisher,
-            cover = "/pages/${issue2.id}/0"
+            cover = "/pages/${issue2.id}/0",
+            ended = false
         )
 
         assertThat(actual.body).isEqualTo(listOf(expectedView))

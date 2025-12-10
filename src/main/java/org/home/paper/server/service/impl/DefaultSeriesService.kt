@@ -31,7 +31,13 @@ class DefaultSeriesService(
     ): List<SeriesAutocompletionView> {
         return seriesRepository.findForAutocompletion(titlePart, PageRequest.of(offset, limit))
             .map {
-                SeriesAutocompletionView(it.getId(), it.title(), it.getIsEnded())
+                SeriesAutocompletionView(
+                    id = it.getId(),
+                    title =it.title(),
+                    ended = it.getIsEnded(),
+                    firstPublication = it.getFirstPublication(),
+                    lastPublication = it.getLastPublication()
+                )
             }
     }
 

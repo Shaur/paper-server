@@ -5,10 +5,10 @@ import org.home.paper.server.dto.IssueView
 import org.home.paper.server.dto.ReadingProgressUpdate
 import org.home.paper.server.exceptions.ObjectNotFoundException
 import org.home.paper.server.exceptions.IllegalStateException
+import org.home.paper.server.extensions.entity
 import org.home.paper.server.model.Issue
 import org.home.paper.server.model.ReadingProgress
 import org.home.paper.server.model.ReadingProgressKey
-import org.home.paper.server.model.auth.AuthentificationEntity
 import org.home.paper.server.repository.IssueRepository
 import org.home.paper.server.repository.ReadingProgressRepository
 import org.home.paper.server.service.IssueService
@@ -33,7 +33,7 @@ class DefaultIssueService(
             throw IllegalStateException(PAGES_COUNT_VIOLATION_MESSAGE)
         }
 
-        val user = (SecurityContextHolder.getContext().authentication.principal as AuthentificationEntity)
+        val user = SecurityContextHolder.getContext().entity()
 
         val progressOptional = readingProgressRepository.findById(ReadingProgressKey(user.id, id))
         if (progressOptional.isEmpty) {
@@ -46,7 +46,7 @@ class DefaultIssueService(
     }
 
     override fun get(id: Long): IssueView {
-        val user = (SecurityContextHolder.getContext().authentication.principal as AuthentificationEntity)
+        val user = SecurityContextHolder.getContext().entity()
 
         val issue = issueRepository.getById(id) ?: throw ObjectNotFoundException(Issue::class.toString(), id)
         val readingProgress = readingProgressRepository.findById(ReadingProgressKey(user.id, id))
@@ -78,7 +78,7 @@ class DefaultIssueService(
     }
 
     override fun getBySeriesId(seriesId: Long): List<IssueView> {
-        val user = (SecurityContextHolder.getContext().authentication.principal as AuthentificationEntity)
+        val user = SecurityContextHolder.getContext().entity()
 
         val issues = issueRepository.getBySeriesId(seriesId)
         val keys = issues.mapNotNull { it.id }.map { ReadingProgressKey(user.id, it) }
