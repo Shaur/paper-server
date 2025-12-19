@@ -25,7 +25,11 @@ public class JwtService {
     private String signingKey;
 
     public String extractUserName(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            return extractClaim(token, Claims::getSubject);
+        } catch(Exception e) {
+            return "";
+        }
     }
 
     private Date extractExpiration(String token) {
@@ -37,8 +41,12 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        var userName = extractUserName(token);
-        return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        try {
+            var userName = extractUserName(token);
+            return userName.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public String generateToken(UserDetails userDetails) {
