@@ -138,6 +138,37 @@ class SeriesPublicControllerTest @Autowired constructor(
     }
 
     @Test
+    fun `find by title part`() {
+        createUser()
+
+        val series = seriesRepository.save(Series(null, "Amazing Spider-Man", "someone"))
+        subscriptionRepository.save(SeriesSubscription(getUser().id, series.id!!))
+
+        val response = restTemplate.exchange<List<SeriesCatalogItemView>>(
+            "/series?titlePart=Spider",
+            HttpMethod.GET,
+            HttpEntity(null, authHeaders()),
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body).isNotEmpty
+
+        val seriesDescription = response.body?.first()
+        assertThat(seriesDescription?.id).isEqualTo(series.id)
+        assertThat(seriesDescription?.title).isEqualTo(series.title)
+        assertThat(seriesDescription?.subscribed).isEqualTo(true)
+
+        val emptyResponse = restTemplate.exchange<List<SeriesCatalogItemView>>(
+            "/series?titlePart=Batman",
+            HttpMethod.GET,
+            HttpEntity(null, authHeaders()),
+        )
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(emptyResponse.body).isEmpty()
+    }
+
+    @Test
     fun `merge series`() {
         createUser()
 

@@ -2,6 +2,7 @@ package org.home.paper.server.controller
 
 import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
+import org.home.paper.server.dto.SeriesFilter
 import org.home.paper.server.dto.SeriesMergeRequest
 import org.home.paper.server.dto.SeriesUpdateRequest
 import org.home.paper.server.service.IssueService
@@ -17,19 +18,23 @@ class SeriesPublicController(
 
     @GetMapping("/autocomplete")
     fun findForAutocompletion(
-        @RequestParam("title", required = false) titlePart: String?,
         @RequestParam("limit", required = false) limit: Int = 10,
         @RequestParam("offset", required = false) offset: Int = 0
     ): List<SeriesAutocompletionView> {
-        return seriesService.findForAutocompletion(titlePart, limit, offset)
+        return seriesService.findForAutocompletion(limit, offset)
     }
 
     @GetMapping
     fun find(
+        @RequestParam("titlePart", required = false) titlePart: String?,
         @RequestParam("limit", required = false) limit: Int = 20,
         @RequestParam("offset", required = false) offset: Int = 0
     ): List<SeriesCatalogItemView> {
-        return seriesService.find(limit, offset)
+        val filter = SeriesFilter(
+            namePart = titlePart
+        )
+
+        return seriesService.findByFilter(filter, limit, offset)
     }
 
     @GetMapping("/{id}")

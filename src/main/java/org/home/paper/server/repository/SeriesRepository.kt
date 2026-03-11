@@ -4,12 +4,12 @@ import org.home.paper.server.model.Series
 import org.home.paper.server.model.projection.SeriesCatalogueItemProjection
 import org.home.paper.server.model.projection.SeriesSearchViewProjection
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface SeriesRepository : CrudRepository<Series, Long> {
+interface SeriesRepository : JpaRepository<Series, Long> {
 
     @Query(
         """
@@ -23,11 +23,10 @@ interface SeriesRepository : CrudRepository<Series, Long> {
                 max(i.publicationDate) as lastPublication
             from series s
                 left join issue i on i.seriesId = s.id
-                where s.title like :titlePart
             group by s.id, s.title
         """
     )
-    fun findForAutocompletion(titlePart: String?, pageable: Pageable): List<SeriesSearchViewProjection>
+    fun findForAutocompletion(pageable: Pageable): List<SeriesSearchViewProjection>
 
     @Query(
         """
@@ -75,5 +74,5 @@ interface SeriesRepository : CrudRepository<Series, Long> {
     )
     fun getById(id: Long, userId: Long): SeriesCatalogueItemProjection?
 
-    fun getById(id: Long): Series?
+//    fun getById(id: Long): Series?
 }
