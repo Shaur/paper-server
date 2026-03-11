@@ -29,10 +29,11 @@ class DefaultSeriesService(
 ) : SeriesService {
 
     override fun findForAutocompletion(
+        titlePart: String?,
         limit: Int,
         offset: Int
     ): List<SeriesAutocompletionView> {
-        return seriesRepository.findForAutocompletion(PageRequest.of(offset, limit))
+        return seriesRepository.findForAutocompletion(titlePart, PageRequest.of(offset, limit))
             .map {
                 SeriesAutocompletionView(
                     id = it.getId(),

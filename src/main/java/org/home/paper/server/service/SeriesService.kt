@@ -7,7 +7,7 @@ import org.home.paper.server.dto.SeriesUpdateRequest
 
 interface SeriesService {
 
-    fun findForAutocompletion(limit: Int = 10, offset: Int = 0): List<SeriesAutocompletionView>
+    fun findForAutocompletion(titlePart: String?, limit: Int = 10, offset: Int = 0): List<SeriesAutocompletionView>
 
     fun find(limit: Int, pageNumber: Int): List<SeriesCatalogItemView>
 

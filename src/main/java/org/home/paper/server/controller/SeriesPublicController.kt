@@ -18,10 +18,11 @@ class SeriesPublicController(
 
     @GetMapping("/autocomplete")
     fun findForAutocompletion(
+        @RequestParam("title", required = false) titlePart: String?,
         @RequestParam("limit", required = false) limit: Int = 10,
         @RequestParam("offset", required = false) offset: Int = 0
     ): List<SeriesAutocompletionView> {
-        return seriesService.findForAutocompletion(limit, offset)
+        return seriesService.findForAutocompletion(titlePart, limit, offset)
     }
 
     @GetMapping

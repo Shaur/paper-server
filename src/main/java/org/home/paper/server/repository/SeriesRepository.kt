@@ -23,10 +23,11 @@ interface SeriesRepository : JpaRepository<Series, Long> {
                 max(i.publicationDate) as lastPublication
             from series s
                 left join issue i on i.seriesId = s.id
+                where s.title like :titlePart
             group by s.id, s.title
         """
     )
-    fun findForAutocompletion(pageable: Pageable): List<SeriesSearchViewProjection>
+    fun findForAutocompletion(titlePart: String?, pageable: Pageable): List<SeriesSearchViewProjection>
 
     @Query(
         """
