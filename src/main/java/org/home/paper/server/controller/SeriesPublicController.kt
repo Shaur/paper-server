@@ -4,6 +4,7 @@ import org.home.paper.server.dto.SeriesAutocompletionView
 import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.dto.SeriesFilter
 import org.home.paper.server.dto.SeriesMergeRequest
+import org.home.paper.server.dto.SeriesSplitRequest
 import org.home.paper.server.dto.SeriesUpdateRequest
 import org.home.paper.server.service.IssueService
 import org.home.paper.server.service.SeriesService
@@ -59,6 +60,11 @@ class SeriesPublicController(
     @PutMapping("/merge")
     fun merge(@RequestBody body: SeriesMergeRequest) {
         seriesService.merge(body.ids)
+    }
+
+    @PutMapping("/split")
+    fun split(@RequestBody body: SeriesSplitRequest) {
+        seriesService.split(body.oldSeriesId, body.issuesIds)
     }
 
     @PutMapping("/{id}")

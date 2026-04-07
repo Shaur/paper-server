@@ -22,4 +22,6 @@ interface SeriesService {
     fun merge(ids: List<Long>)
 
     fun update(id: Long, update: SeriesUpdateRequest)
+
+    fun split(oldSeriesId: Long, issuesIds: List<Long>)
 }

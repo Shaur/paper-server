@@ -47,5 +47,10 @@ class DefaultIssueRepository(
             .executeUpdate()
     }
 
+    override fun getByIds(ids: List<Long>): List<Issue> {
+        return entityManager.createQuery("select i from issue i where i.id in :ids", Issue::class.java)
+            .setParameter("ids", ids)
+            .resultList
+    }
 
 }

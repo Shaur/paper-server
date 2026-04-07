@@ -15,4 +15,6 @@ interface IssueRepository {
     fun deleteAll()
 
     fun delete(id: Long)
+
+    fun getByIds(ids: List<Long>): List<Issue>
 }

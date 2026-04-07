@@ -6,6 +6,7 @@ import org.home.paper.server.Application
 import org.home.paper.server.Dummies.unsavedSeries
 import org.home.paper.server.dto.SeriesCatalogItemView
 import org.home.paper.server.dto.SeriesMergeRequest
+import org.home.paper.server.dto.SeriesSplitRequest
 import org.home.paper.server.model.Issue
 import org.home.paper.server.model.Series
 import org.home.paper.server.model.SeriesSubscription
@@ -220,6 +221,63 @@ class SeriesPublicControllerTest @Autowired constructor(
         )
 
         assertThat(actual.body).isEqualTo(listOf(expectedView))
+    }
+
+    @Test
+    fun `split series`() {
+        createAdmin()
+
+        val series = seriesRepository.save(Series(null, "test", "someone"))
+        val seriesId = series.id!!
+        val issue1 = issueRepository.save(
+            Issue(
+                number = "3",
+                seriesId = seriesId,
+                pagesCount = 10,
+                publicationDate = Date()
+            )
+        )
+
+        val issue2 = issueRepository.save(
+            issue1.copy(
+                id = null,
+                number = "4",
+                seriesId = seriesId
+            )
+        )
+
+        val request = SeriesSplitRequest(
+            oldSeriesId = seriesId,
+            issuesIds = listOf(issue2.id!!)
+        )
+
+        val headers = authHeaders()
+
+        restTemplate.put<Void>(
+            "/series/split",
+            entity = (request to headers),
+        )
+
+        val actual = restTemplate.exchange<List<SeriesCatalogItemView>>(
+            "/series",
+            HttpMethod.GET,
+            HttpEntity<Void>(headers),
+        )
+
+        assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(actual.body?.size).isEqualTo(2)
+
+        assertThat(actual.body).matches {
+            for (view in it) {
+                assertThat(view.title).isEqualTo("${series.title} (${Calendar.getInstance().get(Calendar.YEAR)})")
+                assertThat(view.publisher).isEqualTo(series.publisher)
+                assertThat(view.issuesCount).isEqualTo(1)
+                assertThat(view.ended).isEqualTo(false)
+                assertThat(view.cover).containsAnyOf("/pages/${issue1.id}/0", "/pages/${issue2.id}/0")
+            }
+
+            true
+        }
     }
 
 }

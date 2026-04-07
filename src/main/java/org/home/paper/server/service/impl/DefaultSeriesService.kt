@@ -7,6 +7,7 @@ import org.home.paper.server.dto.SeriesUpdateRequest
 import org.home.paper.server.exceptions.ObjectNotFoundException
 import org.home.paper.server.extensions.entity
 import org.home.paper.server.extensions.title
+import org.home.paper.server.model.Issue
 import org.home.paper.server.model.SeriesSubscription
 import org.home.paper.server.model.projection.FilteredSeriesCatalogItemProjection
 import org.home.paper.server.model.projection.SeriesCatalogueItemProjection
@@ -93,6 +94,16 @@ class DefaultSeriesService(
         val series = seriesRepository.getReferenceById(id) ?: throw ObjectNotFoundException("Series", id)
         val updatedSeries = series.copy(isEnded = update.ended)
         seriesRepository.save(updatedSeries)
+    }
+
+    @Transactional
+    override fun split(oldSeriesId: Long, issuesIds: List<Long>) {
+        val series = seriesRepository.getReferenceById(oldSeriesId) ?: throw ObjectNotFoundException("Series", oldSeriesId)
+        val newSeries = seriesRepository.save(series.copy(id = null))
+        val issues: List<Issue> = issueRepository.getByIds(issuesIds)
+        for (issue in issues) {
+            issueRepository.save(issue.copy(seriesId = newSeries.id!!))
+        }
     }
 
     private fun converter(projection: SeriesCatalogueItemProjection): SeriesCatalogItemView {
