@@ -35,8 +35,7 @@ public class SecurityConfiguration {
             "/private/comics/purgatory/file/**",
             "/pages/**",
             "/actuator/health/**",
-            "/actuator/health",
-            "/actuator/**"
+            "/actuator/health"
     };
 
     private final JwtAuthenticationFilter filter;
