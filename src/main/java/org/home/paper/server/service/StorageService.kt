@@ -58,7 +58,9 @@ interface StorageService {
                 return scaledFile
             }
 
-            val inputImage = ImageIO.read(originalImg)
+            //If a format unsupported, return the full image. Not the best solution, but better than nothing
+            val inputImage = ImageIO.read(originalImg) ?: return originalImg
+
             val resizedImage = Scalr.resize(
                 inputImage,
                 Scalr.Method.QUALITY,

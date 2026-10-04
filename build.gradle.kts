@@ -1,18 +1,18 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.5.8"
-    id("org.jetbrains.kotlin.plugin.spring") version "2.2.20"
-    id("org.jetbrains.kotlin.plugin.jpa") version "2.2.20"
+    id("org.springframework.boot") version "3.5.16"
+    id("org.jetbrains.kotlin.plugin.spring") version "2.4.20"
+    id("org.jetbrains.kotlin.plugin.jpa") version "2.4.20"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.flywaydb.flyway") version "10.17.1"
-    id("org.jetbrains.kotlin.plugin.noarg") version "2.2.20"
+    id("org.flywaydb.flyway") version "13.9.0"
+    id("org.jetbrains.kotlin.plugin.noarg") version "2.4.20"
 
     kotlin("jvm")
 }
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:10.17.1")
+        classpath("org.flywaydb:flyway-database-postgresql:13.9.0")
     }
 }
 
@@ -37,16 +37,15 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
-    implementation("io.jsonwebtoken:jjwt-api:0.12.6")
-    implementation("io.jsonwebtoken:jjwt-impl:0.12.6")
-    implementation("io.jsonwebtoken:jjwt-jackson:0.12.6")
+    implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    implementation("io.jsonwebtoken:jjwt-impl:0.13.0")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.13.0")
 
-    implementation("org.flywaydb:flyway-core:10.17.1")
-    implementation("org.flywaydb:flyway-database-postgresql:10.17.1")
+    implementation("org.flywaydb:flyway-core:13.9.0")
+    implementation("org.flywaydb:flyway-database-postgresql:13.9.0")
     implementation("org.postgresql:postgresql")
 
-    implementation("com.github.junrar:junrar:7.5.5")
-    implementation("org.apache.commons:commons-text:1.12.0")
+    implementation("org.apache.commons:commons-text:1.15.0")
 
     implementation("com.squareup.okhttp3:okhttp:5.2.1")
 

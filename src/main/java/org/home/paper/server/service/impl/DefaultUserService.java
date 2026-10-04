@@ -38,7 +38,7 @@ public class DefaultUserService implements UserService {
 
     public User getByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ObjectNotFoundException("User", username));
     }
 
     @Override

@@ -193,7 +193,7 @@ class SeriesPublicControllerTest @Autowired constructor(
             )
         )
 
-        val request = SeriesMergeRequest(listOf(series1.id, series2.id))
+        val request = SeriesMergeRequest(listOf(series1.id!!, series2.id!!))
 
         val headers = authHeaders()
 
@@ -212,7 +212,7 @@ class SeriesPublicControllerTest @Autowired constructor(
         assertThat(actual.body?.size).isEqualTo(1)
 
         val expectedView = SeriesCatalogItemView(
-            id = series1.id,
+            id = series1.id!!,
             title = "${series1.title} (${Calendar.getInstance().get(Calendar.YEAR)})",
             issuesCount = 2,
             publisher = series1.publisher,

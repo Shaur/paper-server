@@ -8,14 +8,14 @@ import jakarta.persistence.IdClass
 @IdClass(ReadingProgressKey::class)
 class ReadingProgress(
     @Id
-    val userId: Long,
+    var userId: Long,
 
     @Id
-    val issueId: Long,
+    var issueId: Long,
 
-    val currentPage: Int,
+    var currentPage: Int,
 
-    val updateTime: Long
+    var updateTime: Long
 ) {
 
     fun update(currentPage: Int, updateTime: Long): ReadingProgress {

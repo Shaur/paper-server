@@ -68,15 +68,15 @@ class IssueControllerTest @Autowired constructor(
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
 
-        val progress = readingProgressRepository.getReferenceById(ReadingProgressKey(getUser().id, issue.id!!))
+        val progress = readingProgressRepository.findById(ReadingProgressKey(getUser().id, issue.id!!))
         val expectedProgress = ReadingProgress(
             userId = getUser().id,
-            issueId = issue.id,
+            issueId = issue.id!!,
             currentPage = 3,
             updateTime = 40L
         )
 
-        assertThat(progress).isEqualTo(expectedProgress)
+        assertThat(progress.get()).isEqualTo(expectedProgress)
     }
 
     @Test
