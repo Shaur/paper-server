@@ -17,6 +17,7 @@ interface SeriesRepository : JpaRepository<Series, Long> {
                 s.id as id, 
                 s.title as title, 
                 s.isEnded as isEnded,
+                s.publisher as publisher,
                 min(EXTRACT(YEAR FROM i.publicationDate)) as minYear, 
                 max(EXTRACT(YEAR FROM i.publicationDate)) as maxYear,
                 min(i.publicationDate) as firstPublication,

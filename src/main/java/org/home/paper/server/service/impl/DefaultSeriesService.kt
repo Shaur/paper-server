@@ -39,6 +39,7 @@ class DefaultSeriesService(
                 SeriesAutocompletionView(
                     id = it.getId(),
                     title = it.title(),
+                    publisher = it.getPublisher(),
                     ended = it.getIsEnded(),
                     firstPublication = it.getFirstPublication(),
                     lastPublication = it.getLastPublication()
