@@ -11,28 +11,26 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.test.web.client.exchange
-import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
 import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.web.servlet.client.RestTestClient
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.io.File
 
 @SpringBootTest(classes = [Application::class], webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration
+@AutoConfigureRestTestClient
 class ComicsPrivateApiControllerTest @Autowired constructor(
     userRepository: UserRepository,
     jwtService: JwtService,
-    private val restTemplate: TestRestTemplate,
+    private val restClient: RestTestClient,
     private val purgatoryRepository: PurgatoryRepository
 ) : AbstractControllerTest(userRepository, jwtService) {
 
-    @Value("\${storage.purgatory-path}")
+    @Value($$"${storage.purgatory-path}")
     private lateinit var imageDir: String
 
     @AfterEach
@@ -65,13 +63,10 @@ class ComicsPrivateApiControllerTest @Autowired constructor(
         val headers = HttpHeaders()
         headers.setBearerAuth(jwtToken)
 
-        val response = restTemplate.exchange<Void>(
-            "/private/comics/purgatory/${savedItem.id}/0",
-            HttpMethod.DELETE,
-            HttpEntity<Void>(headers)
-        )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        restClient.delete()
+            .uri("/private/comics/purgatory/${savedItem.id}/0")
+            .headers { h -> h.addAll(headers) }
+            .exchangeSuccessfully()
 
         val updatedIssue = purgatoryRepository.get(savedItem.id!!)
         assertThat(updatedIssue?.meta?.pagesCount).isEqualTo(2)

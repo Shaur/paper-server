@@ -15,13 +15,10 @@ import org.home.paper.server.service.JwtService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.test.web.client.exchange
-import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
+import org.springframework.test.web.servlet.client.RestTestClient
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
@@ -29,10 +26,11 @@ import org.springframework.transaction.annotation.Transactional
     classes = [Application::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@AutoConfigureRestTestClient
 class IssueControllerTest @Autowired constructor(
     userRepository: UserRepository,
     jwtService: JwtService,
-    private val restTemplate: TestRestTemplate,
+    private val restClient: RestTestClient,
     private val readingProgressRepository: ReadingProgressRepository,
     private val seriesRepository: SeriesRepository,
     private val issueRepository: IssueRepository
@@ -60,13 +58,11 @@ class IssueControllerTest @Autowired constructor(
         val headers = HttpHeaders()
         headers.setBearerAuth(jwtToken)
 
-        val response = restTemplate.exchange<Void>(
-            "/issue/${issue.id}",
-            HttpMethod.PUT,
-            HttpEntity(updateBody, headers)
-        )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        restClient.put()
+            .uri("/issue/${issue.id}")
+            .body(updateBody)
+            .headers { h -> h.addAll(headers) }
+            .exchangeSuccessfully()
 
         val progress = readingProgressRepository.findById(ReadingProgressKey(getUser().id, issue.id!!))
         val expectedProgress = ReadingProgress(
@@ -89,13 +85,12 @@ class IssueControllerTest @Autowired constructor(
         val headers = HttpHeaders()
         headers.setBearerAuth(jwtToken)
 
-        val response = restTemplate.exchange<Void>(
-            "/issue/${issue.id}",
-            HttpMethod.DELETE,
-            HttpEntity(null, headers)
-        )
+        val response = restClient.delete()
+            .uri("/issue/${issue.id}")
+            .headers{h -> h.addAll(headers) }
+            .exchange()
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+        response.expectStatus().isForbidden
     }
 
     @Test
@@ -109,13 +104,10 @@ class IssueControllerTest @Autowired constructor(
         val headers = HttpHeaders()
         headers.setBearerAuth(jwtToken)
 
-        val response = restTemplate.exchange<Void>(
-            "/issue/${issue.id}",
-            HttpMethod.DELETE,
-            HttpEntity(null, headers)
-        )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        restClient.delete()
+            .uri("/issue/${issue.id}")
+            .headers{h -> h.addAll(headers) }
+            .exchangeSuccessfully()
     }
 
 }

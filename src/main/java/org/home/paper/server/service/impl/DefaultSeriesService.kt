@@ -92,14 +92,14 @@ class DefaultSeriesService(
     }
 
     override fun update(id: Long, update: SeriesUpdateRequest) {
-        val series = seriesRepository.getReferenceById(id) ?: throw ObjectNotFoundException("Series", id)
+        val series = seriesRepository.getReferenceById(id)
         val updatedSeries = series.copy(isEnded = update.ended)
         seriesRepository.save(updatedSeries)
     }
 
     @Transactional
     override fun split(oldSeriesId: Long, issuesIds: List<Long>) {
-        val series = seriesRepository.getReferenceById(oldSeriesId) ?: throw ObjectNotFoundException("Series", oldSeriesId)
+        val series = seriesRepository.getReferenceById(oldSeriesId)
         val newSeries = seriesRepository.save(series.copy(id = null))
         val issues: List<Issue> = issueRepository.getByIds(issuesIds)
         for (issue in issues) {

@@ -2,17 +2,16 @@ package org.home.paper.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpStatusCode;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureRestTestClient
 class ApplicationTests {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private RestTestClient restClient;
 
     @Test
     void contextLoads() {
@@ -20,12 +19,13 @@ class ApplicationTests {
 
     @Test
     void actuatorTest() {
-        var healthStatusResponse = restTemplate.getForEntity("/actuator/health", HeathStatus.class);
-        assertThat(healthStatusResponse.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(200));
-
-        var healthStatus = healthStatusResponse.getBody();
-        assertThat(healthStatus).isEqualTo(new HeathStatus("UP"));
+        restClient.get()
+                .uri("/actuator/health")
+                .exchangeSuccessfully()
+                .expectBody(HeathStatus.class)
+                .isEqualTo(new HeathStatus("UP"));
     }
 
-    private record HeathStatus(String status) {}
+    private record HeathStatus(String status) {
+    }
 }

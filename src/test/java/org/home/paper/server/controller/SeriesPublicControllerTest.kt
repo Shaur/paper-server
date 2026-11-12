@@ -10,7 +10,6 @@ import org.home.paper.server.dto.SeriesSplitRequest
 import org.home.paper.server.model.Issue
 import org.home.paper.server.model.Series
 import org.home.paper.server.model.SeriesSubscription
-import org.home.paper.server.put
 import org.home.paper.server.repository.IssueRepository
 import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.repository.SeriesSubscriptionRepository
@@ -19,12 +18,10 @@ import org.home.paper.server.service.JwtService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.test.web.client.exchange
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
+import org.springframework.test.web.servlet.client.RestTestClient
+import org.springframework.test.web.servlet.client.expectBody
 import org.springframework.transaction.support.TransactionTemplate
 import java.util.*
 
@@ -32,10 +29,11 @@ import java.util.*
     classes = [Application::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
+@AutoConfigureRestTestClient
 class SeriesPublicControllerTest @Autowired constructor(
     userRepository: UserRepository,
     jwtService: JwtService,
-    private val restTemplate: TestRestTemplate,
+    private val restClient: RestTestClient,
     private val seriesRepository: SeriesRepository,
     private val issueRepository: IssueRepository,
     private val subscriptionRepository: SeriesSubscriptionRepository,
@@ -60,12 +58,10 @@ class SeriesPublicControllerTest @Autowired constructor(
 
         val series = seriesRepository.save(unsavedSeries)
 
-        val response = restTemplate.put<Void>(
-            "/series/${series.id}/subscribe",
-            entity = (null to authHeaders())
-        )
-
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        restClient.put()
+            .uri("/series/${series.id}/subscribe")
+            .headers { headers -> headers.addAll(authHeaders()) }
+            .exchangeSuccessfully()
 
         val subscriptions = subscriptionRepository.getByUserId(getUser().id)
         assertThat(subscriptions)
@@ -85,12 +81,11 @@ class SeriesPublicControllerTest @Autowired constructor(
         var subscriptions = subscriptionRepository.getByUserId(getUser().id)
         assertThat(subscriptions).hasSize(1)
 
-        val response = restTemplate.put<Void>(
-            "/series/${series.id}/unsubscribe",
-            entity = null to authHeaders()
-        )
+        restClient.put()
+            .uri("/series/${series.id}/unsubscribe")
+            .headers { headers -> headers.addAll(authHeaders()) }
+            .exchangeSuccessfully()
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         subscriptions = subscriptionRepository.getByUserId(getUser().id)
         assertThat(subscriptions).hasSize(0)
     }
@@ -101,19 +96,20 @@ class SeriesPublicControllerTest @Autowired constructor(
 
         val series = seriesRepository.save(Series(null, "test", "someone"))
 
-        val response = restTemplate.exchange<List<SeriesCatalogItemView>>(
-            "/series",
-            HttpMethod.GET,
-            HttpEntity(null, authHeaders()),
-        )
+        val response = restClient.get()
+            .uri("/series")
+            .headers { headers -> headers.addAll(authHeaders()) }
+            .exchangeSuccessfully()
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).isNotEmpty
+        response.expectBody<List<SeriesCatalogItemView>>()
+            .value { values ->
+                assertThat(values).isNotEmpty
 
-        val seriesDescription = response.body?.first()
-        assertThat(seriesDescription?.id).isEqualTo(series.id)
-        assertThat(seriesDescription?.title).isEqualTo(series.title)
-        assertThat(seriesDescription?.subscribed).isEqualTo(false)
+                val seriesDescription = values?.first()
+                assertThat(seriesDescription?.id).isEqualTo(series.id)
+                assertThat(seriesDescription?.title).isEqualTo(series.title)
+                assertThat(seriesDescription?.subscribed).isEqualTo(false)
+            }
     }
 
     @Test
@@ -123,19 +119,20 @@ class SeriesPublicControllerTest @Autowired constructor(
         val series = seriesRepository.save(Series(null, "test", "someone"))
         subscriptionRepository.save(SeriesSubscription(getUser().id, series.id!!))
 
-        val response = restTemplate.exchange<List<SeriesCatalogItemView>>(
-            "/series",
-            HttpMethod.GET,
-            HttpEntity(null, authHeaders()),
-        )
+        val response = restClient.get()
+            .uri("/series")
+            .headers { headers -> headers.addAll(authHeaders()) }
+            .exchangeSuccessfully()
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).isNotEmpty
+        response.expectBody<List<SeriesCatalogItemView>>()
+            .value { values ->
+                assertThat(values).isNotEmpty
 
-        val seriesDescription = response.body?.first()
-        assertThat(seriesDescription?.id).isEqualTo(series.id)
-        assertThat(seriesDescription?.title).isEqualTo(series.title)
-        assertThat(seriesDescription?.subscribed).isEqualTo(true)
+                val seriesDescription = values?.first()
+                assertThat(seriesDescription?.id).isEqualTo(series.id)
+                assertThat(seriesDescription?.title).isEqualTo(series.title)
+                assertThat(seriesDescription?.subscribed).isEqualTo(true)
+            }
     }
 
     @Test
@@ -145,28 +142,28 @@ class SeriesPublicControllerTest @Autowired constructor(
         val series = seriesRepository.save(Series(null, "Amazing Spider-Man", "someone"))
         subscriptionRepository.save(SeriesSubscription(getUser().id, series.id!!))
 
-        val response = restTemplate.exchange<List<SeriesCatalogItemView>>(
-            "/series?titlePart=Spider",
-            HttpMethod.GET,
-            HttpEntity(null, authHeaders()),
-        )
+        val response = restClient.get()
+            .uri("/series?titlePart=Spider")
+            .headers { headers -> headers.addAll(authHeaders()) }
+            .exchangeSuccessfully()
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).isNotEmpty
+        response.expectBody<List<SeriesCatalogItemView>>()
+            .value { values ->
+                assertThat(values).isNotEmpty
 
-        val seriesDescription = response.body?.first()
-        assertThat(seriesDescription?.id).isEqualTo(series.id)
-        assertThat(seriesDescription?.title).isEqualTo(series.title)
-        assertThat(seriesDescription?.subscribed).isEqualTo(true)
+                val seriesDescription = values?.first()
+                assertThat(seriesDescription?.id).isEqualTo(series.id)
+                assertThat(seriesDescription?.title).isEqualTo(series.title)
+                assertThat(seriesDescription?.subscribed).isEqualTo(true)
+            }
 
-        val emptyResponse = restTemplate.exchange<List<SeriesCatalogItemView>>(
-            "/series?titlePart=Batman",
-            HttpMethod.GET,
-            HttpEntity(null, authHeaders()),
-        )
+        val emptyResponse = restClient.get()
+            .uri("/series?titlePart=Batman")
+            .headers { headers -> headers.addAll(authHeaders()) }
+            .exchangeSuccessfully()
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(emptyResponse.body).isEmpty()
+        emptyResponse.expectBody<List<SeriesCatalogItemView>>()
+            .value { values -> assertThat(values).isEmpty() }
     }
 
     @Test
@@ -197,19 +194,16 @@ class SeriesPublicControllerTest @Autowired constructor(
 
         val headers = authHeaders()
 
-        restTemplate.put<Void>(
-            "/series/merge",
-            entity = (request to headers),
-        )
+        restClient.put()
+            .uri("/series/merge")
+            .body(request)
+            .headers { h -> h.addAll(headers) }
+            .exchangeSuccessfully()
 
-        val actual = restTemplate.exchange<List<SeriesCatalogItemView>>(
-            "/series",
-            HttpMethod.GET,
-            HttpEntity<Void>(headers),
-        )
-
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(actual.body?.size).isEqualTo(1)
+        val actual = restClient.get()
+            .uri("/series")
+            .headers { h -> h.addAll(headers) }
+            .exchangeSuccessfully()
 
         val expectedView = SeriesCatalogItemView(
             id = series1.id!!,
@@ -220,7 +214,11 @@ class SeriesPublicControllerTest @Autowired constructor(
             ended = false
         )
 
-        assertThat(actual.body).isEqualTo(listOf(expectedView))
+        actual.expectBody<List<SeriesCatalogItemView>>()
+            .value { values ->
+                assertThat(values?.size).isEqualTo(1)
+                assertThat(values).isEqualTo(listOf(expectedView))
+            }
     }
 
     @Test
@@ -253,31 +251,34 @@ class SeriesPublicControllerTest @Autowired constructor(
 
         val headers = authHeaders()
 
-        restTemplate.put<Void>(
-            "/series/split",
-            entity = (request to headers),
-        )
+        restClient.put()
+            .uri("/series/split")
+            .body(request)
+            .headers { h -> h.addAll(headers) }
+            .exchangeSuccessfully()
 
-        val actual = restTemplate.exchange<List<SeriesCatalogItemView>>(
-            "/series",
-            HttpMethod.GET,
-            HttpEntity<Void>(headers),
-        )
+        val actual = restClient.get()
+            .uri("/series")
+            .headers { h -> h.addAll(headers) }
+            .exchangeSuccessfully()
 
-        assertThat(actual.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(actual.body?.size).isEqualTo(2)
+        actual.expectBody<List<SeriesCatalogItemView>>()
+            .value { values ->
+                assertThat(values?.size).isEqualTo(2)
 
-        assertThat(actual.body).matches {
-            for (view in it) {
-                assertThat(view.title).isEqualTo("${series.title} (${Calendar.getInstance().get(Calendar.YEAR)})")
-                assertThat(view.publisher).isEqualTo(series.publisher)
-                assertThat(view.issuesCount).isEqualTo(1)
-                assertThat(view.ended).isEqualTo(false)
-                assertThat(view.cover).containsAnyOf("/pages/${issue1.id}/0", "/pages/${issue2.id}/0")
+                assertThat(values).matches {
+                    for (view in it) {
+                        assertThat(view.title)
+                            .isEqualTo("${series.title} (${Calendar.getInstance().get(Calendar.YEAR)})")
+                        assertThat(view.publisher).isEqualTo(series.publisher)
+                        assertThat(view.issuesCount).isEqualTo(1)
+                        assertThat(view.ended).isEqualTo(false)
+                        assertThat(view.cover).containsAnyOf("/pages/${issue1.id}/0", "/pages/${issue2.id}/0")
+                    }
+
+                    return@matches true
+                }
             }
-
-            true
-        }
     }
 
 }

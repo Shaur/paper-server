@@ -8,21 +8,23 @@ import org.home.paper.server.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = CustomerControllerTest.Initializer.class)
+@AutoConfigureRestTestClient
 public class CustomerControllerTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private RestTestClient restClient;
 
     @Autowired
     private UserRepository userRepository;
@@ -35,17 +37,26 @@ public class CustomerControllerTest {
     @Test
     public void authorizationTest() {
         var signUpRequest = new SignUpRequest("user", "password");
-        var signUpResponse = restTemplate.postForEntity("/customer/register", signUpRequest, JwtAuthenticationResponse.class);
-        var jwtAuthentication = signUpResponse.getBody();
-
-        assertThat(jwtAuthentication).isNotNull();
-        assertThat(jwtAuthentication.token()).isNotNull();
+        restClient.post()
+                .uri("/customer/register")
+                .body(signUpRequest)
+                .exchangeSuccessfully()
+                .expectBody(JwtAuthenticationResponse.class)
+                .value(jwtAuthentication -> {
+                    assertThat(jwtAuthentication).isNotNull();
+                    assertThat(jwtAuthentication.token()).isNotNull();
+                });
 
         var signInRequest = new SignInRequest("user", "password");
-        var signInResponse = restTemplate.postForEntity("/customer/login", signInRequest, JwtAuthenticationResponse.class);
-
-        assertThat(signInResponse.getBody()).isNotNull();
-        assertThat(signInResponse.getBody().token()).isNotNull();
+        restClient.post()
+                .uri("/customer/login")
+                .body(signInRequest)
+                .exchangeSuccessfully()
+                .expectBody(JwtAuthenticationResponse.class)
+                .value(jwtAuthentication -> {
+                    assertThat(jwtAuthentication).isNotNull();
+                    assertThat(jwtAuthentication.token()).isNotNull();
+                });
     }
 
     static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
