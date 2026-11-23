@@ -62,19 +62,25 @@ ingress:
         - path: /
   tls: []
 
-resources: {}
+resources:
+  requests:
+    cpu: 0.5
+    memory: 512Mi
+  limits:
+    cpu: 1
+    memory: 1536Mi
 
 livenessProbe:
   httpGet:
     scheme: HTTP
-    path: /actuator/health
+    path: /actuator/health/liveness
     port: 8080
     initialDelaySeconds: 30
     periodSeconds: 10
 readinessProbe:
   httpGet:
     scheme: HTTP
-    path: /actuator/health
+    path: /actuator/health/readiness
     port: 8080
-    initialDelaySeconds: 30
+    initialDelaySeconds: 5
     periodSeconds: 10

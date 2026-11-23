@@ -75,3 +75,5 @@ tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("-javaagent:${mockitoAgent.asPath}")
 }
+
+tasks.jar { enabled = false }
