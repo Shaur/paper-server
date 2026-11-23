@@ -63,4 +63,15 @@ internal class SecurityConfigurationTest @Autowired constructor(
             .exchange()
             .expectStatus().isUnauthorized()
     }
+
+    @Test
+    fun `cors preflight`() {
+        restClient.options()
+            .uri("/series")
+            .header(HttpHeaders.ORIGIN, "https://evil.example")
+            .header("Access-Control-Request-Method", "GET")
+            .exchangeSuccessfully()
+            .expectHeader().doesNotExist("Access-Control-Allow-Credentials")
+            .expectHeader().valueEquals("Access-Control-Allow-Origin", "*")
+    }
 }

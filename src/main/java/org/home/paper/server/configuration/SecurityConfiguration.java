@@ -51,10 +51,10 @@ public class SecurityConfiguration {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(_ -> {
                     var configuration = new CorsConfiguration();
-                    configuration.setAllowedOriginPatterns(List.of("*"));
+                    configuration.setAllowedOrigins(List.of("*"));
                     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     configuration.setAllowedHeaders(List.of("*"));
-                    configuration.setAllowCredentials(true);
+                    configuration.setAllowCredentials(false);
                     return configuration;
                 }))
                 .authorizeHttpRequests((requests) ->
