@@ -33,6 +33,7 @@ public class SecurityConfiguration {
 
     private static final String[] AUTH_WHITELIST = {
             "/",
+            "/error",
             "/customer/login",
             "/customer/register",
             "/actuator/health/**"

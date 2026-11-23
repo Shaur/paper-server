@@ -35,6 +35,26 @@ public class CustomerControllerTest {
     }
 
     @Test
+    public void createUserWithExistsName() {
+        var signUpRequest = new SignUpRequest("user", "password");
+        restClient.post()
+                .uri("/customer/register")
+                .body(signUpRequest)
+                .exchangeSuccessfully()
+                .expectBody(JwtAuthenticationResponse.class)
+                .value(jwtAuthentication -> {
+                    assertThat(jwtAuthentication).isNotNull();
+                    assertThat(jwtAuthentication.token()).isNotNull();
+                });
+
+        restClient.post()
+                .uri("/customer/register")
+                .body(signUpRequest)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
     public void authorizationTest() {
         var signUpRequest = new SignUpRequest("user", "password");
         restClient.post()

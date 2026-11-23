@@ -1,6 +1,7 @@
 package org.home.paper.server.service.impl;
 
 import org.home.paper.server.exceptions.ObjectNotFoundException;
+import org.home.paper.server.exceptions.IllegalStateException;
 import org.home.paper.server.model.auth.User;
 import org.home.paper.server.repository.RoleRepository;
 import org.home.paper.server.repository.UserRepository;
@@ -31,7 +32,7 @@ public class DefaultUserService implements UserService {
 
     public User create(User user) {
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new IllegalStateException("Username already exists");
         }
 
         return save(user);
