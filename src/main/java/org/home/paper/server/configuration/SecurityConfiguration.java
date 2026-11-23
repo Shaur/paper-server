@@ -6,6 +6,7 @@ import org.home.paper.server.service.UserService;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -34,10 +35,7 @@ public class SecurityConfiguration {
             "/",
             "/customer/login",
             "/customer/register",
-            "/private/comics/purgatory/file/**",
-            "/pages/**",
-            "/actuator/health/**",
-            "/actuator/health"
+            "/actuator/health/**"
     };
 
     private final JwtAuthenticationFilter filter;
@@ -61,6 +59,9 @@ public class SecurityConfiguration {
                 }))
                 .authorizeHttpRequests((requests) ->
                         requests
+                                // public GET: <img> and coil3 can't send Authorization headers
+                                .requestMatchers(HttpMethod.GET, "/pages/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/private/comics/purgatory/file/**").permitAll()
                                 .requestMatchers(AUTH_WHITELIST).permitAll()
                                 .anyRequest().authenticated()
                 )

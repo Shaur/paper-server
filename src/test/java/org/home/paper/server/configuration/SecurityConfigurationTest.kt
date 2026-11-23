@@ -55,4 +55,12 @@ internal class SecurityConfigurationTest @Autowired constructor(
             .expectBody()
             .json("{\"error\":\"unauthorized\"}")
     }
+
+    @Test
+    fun `unauthorized for post image`() {
+        restClient.post()
+            .uri("/pages/anything")
+            .exchange()
+            .expectStatus().isUnauthorized()
+    }
 }
