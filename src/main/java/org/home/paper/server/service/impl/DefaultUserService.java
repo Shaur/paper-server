@@ -5,6 +5,7 @@ import org.home.paper.server.model.auth.User;
 import org.home.paper.server.repository.RoleRepository;
 import org.home.paper.server.repository.UserRepository;
 import org.home.paper.server.service.UserService;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -38,11 +39,11 @@ public class DefaultUserService implements UserService {
 
     public User getByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ObjectNotFoundException("User", username));
+                .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public @NonNull UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
         var user = getByUsername(username);
         var role = roleRepository.findByName(user.getRole());
         if (role == null) {

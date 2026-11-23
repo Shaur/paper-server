@@ -1,5 +1,6 @@
 package org.home.paper.server.configuration;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,9 +8,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.home.paper.server.service.JwtService;
 import org.home.paper.server.service.UserService;
 import org.jspecify.annotations.NonNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -43,12 +45,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         var jwt = header.substring(HEADER_PREFIX.length());
-        String username = jwtService.extractUserName(jwt);
+        String username;
+        try {
+            username = jwtService.extractUserName(jwt);
+        } catch (JwtException _) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (!username.isEmpty() && SecurityContextHolder.getContext().getAuthentication() == null) {
             var context = SecurityContextHolder.createEmptyContext();
-            var userDetails = userService.loadUserByUsername(username);
+            UserDetails userDetails;
+            try {
+                userDetails = userService.loadUserByUsername(username);
+            } catch (UsernameNotFoundException _) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             if (!jwtService.isTokenValid(jwt, userDetails)) {
-                response.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase());
+                filterChain.doFilter(request, response);
                 return;
             }
 

@@ -25,11 +25,7 @@ public class JwtService {
     private String signingKey;
 
     public String extractUserName(String token) {
-        try {
-            return extractClaim(token, Claims::getSubject);
-        } catch(Exception e) {
-            return "";
-        }
+        return extractClaim(token, Claims::getSubject);
     }
 
     private Date extractExpiration(String token) {

@@ -3,6 +3,7 @@ package org.home.paper.server.configuration;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.home.paper.server.service.UserService;
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.io.IOException;
 import java.util.List;
 
 @Configuration
@@ -47,7 +49,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(_ -> {
                     var configuration = new CorsConfiguration();
@@ -73,11 +75,13 @@ public class SecurityConfiguration {
 
         @Override
         public void commence(
-                HttpServletRequest request,
+                @NonNull HttpServletRequest request,
                 HttpServletResponse response,
-                AuthenticationException authException
-        ) {
-            response.setStatus(response.getStatus());
+                @NonNull AuthenticationException authException
+        ) throws IOException {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write("{\"error\":\"unauthorized\"}");
         }
     }
 
@@ -89,7 +93,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) {
         return configuration.getAuthenticationManager();
     }
 
