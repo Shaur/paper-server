@@ -40,17 +40,14 @@ podLabels: {}
 podSecurityContext:
   fsGroup: 10001
   runAsNonRoot: true
-  readOnlyFilesystem: true
-  allowPrivilegeEscalation: false
-  capabilities.drop: [ALL]
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext:
+   capabilities:
+     drop:
+     - ALL
+   readOnlyRootFilesystem: true
+   runAsNonRoot: true
+   runAsUser: 10001
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:

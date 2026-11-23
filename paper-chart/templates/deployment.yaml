@@ -26,7 +26,7 @@ spec:
         - name: paper-service-storage
           persistentVolumeClaim:
             claimName: paper-service-pvc
-        - name: tml
+        - name: tmp
           emptyDir: {}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
