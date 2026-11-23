@@ -26,6 +26,8 @@ spec:
         - name: paper-service-storage
           persistentVolumeClaim:
             claimName: paper-service-pvc
+        - name: tml
+          emptyDir: {}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -46,6 +48,8 @@ spec:
           volumeMounts:
             - mountPath: "/usr/local/storage"
               name: paper-service-storage
+            - mountPath: "/tmp"
+              name: tmp
           envFrom:
             - configMapRef:
                 name: paper-service-config

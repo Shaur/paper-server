@@ -37,8 +37,12 @@ podAnnotations: {}
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 podLabels: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  fsGroup: 10001
+  runAsNonRoot: true
+  readOnlyFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities.drop: [ALL]
 
 securityContext: {}
   # capabilities:
@@ -69,11 +73,11 @@ livenessProbe:
     path: /actuator/health
     port: 8080
     initialDelaySeconds: 30
-    periodSeconds: 3
+    periodSeconds: 10
 readinessProbe:
   httpGet:
     scheme: HTTP
     path: /actuator/health
     port: 8080
     initialDelaySeconds: 30
-    periodSeconds: 3
+    periodSeconds: 10

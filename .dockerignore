@@ -1,0 +1,9 @@
+.git
+.gradle
+gradle
+src
+paper-chart
+build/classes
+build/tmp
+build/kotlin
+docker-compose*
