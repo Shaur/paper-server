@@ -71,10 +71,13 @@ class DefaultIssueService(
         val issue = issueRepository.getById(id) ?: throw ObjectNotFoundException(Issue::class.toString(), id)
 
         val updatedIssue = issue.copy(
-            number = body.number
+            number = body.number ?: issue.number,
+            publicationDate = body.publicationDate ?: issue.publicationDate
         )
 
-        issueRepository.save(updatedIssue)
+        if (updatedIssue != issue) {
+            issueRepository.save(updatedIssue)
+        }
     }
 
     override fun getBySeriesId(seriesId: Long): List<IssueView> {
