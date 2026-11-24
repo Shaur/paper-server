@@ -73,14 +73,14 @@ resources:
 livenessProbe:
   httpGet:
     scheme: HTTP
-    path: /actuator/health/liveness
+    path: /actuator/health
     port: 8080
     initialDelaySeconds: 30
     periodSeconds: 15
 readinessProbe:
   httpGet:
     scheme: HTTP
-    path: /actuator/health/readiness
+    path: /actuator/health
     port: 8080
     initialDelaySeconds: 30
     periodSeconds: 15
