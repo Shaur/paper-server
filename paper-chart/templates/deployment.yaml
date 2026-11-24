@@ -53,6 +53,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: paper-service-config
+          startupProbe:
+            {{- toYaml .Values.startupProbe | nindent 12 }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:

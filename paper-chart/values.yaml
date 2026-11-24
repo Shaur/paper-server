@@ -70,17 +70,24 @@ resources:
     cpu: 1500m
     memory: 2048Mi
 
+startupProbe:
+  httpGet:
+    scheme: HTTP
+    path: /actuator/health/liveness
+    port: 8080
+  periodSeconds: 10
+  failureThreshold: 30
+
 livenessProbe:
   httpGet:
     scheme: HTTP
-    path: /actuator/health
+    path: /actuator/health/liveness
     port: 8080
-    initialDelaySeconds: 60
-    periodSeconds: 15
+  periodSeconds: 10
+
 readinessProbe:
   httpGet:
     scheme: HTTP
-    path: /actuator/health
+    path: /actuator/health/readiness
     port: 8080
-    initialDelaySeconds: 60
-    periodSeconds: 15
+  periodSeconds: 10
