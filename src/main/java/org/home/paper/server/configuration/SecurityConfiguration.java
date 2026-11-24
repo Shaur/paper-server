@@ -36,7 +36,8 @@ public class SecurityConfiguration {
             "/error",
             "/customer/login",
             "/customer/register",
-            "/actuator/health/**"
+            "/actuator/health/**",
+            "/actuator/health",
     };
 
     private final JwtAuthenticationFilter filter;
