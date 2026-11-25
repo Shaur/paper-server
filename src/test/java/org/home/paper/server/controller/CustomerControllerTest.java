@@ -7,6 +7,8 @@ import org.home.paper.server.dto.SignUpRequest;
 import org.home.paper.server.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +17,8 @@ import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.client.RestTestClient;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,6 +56,26 @@ public class CustomerControllerTest {
                 .body(signUpRequest)
                 .exchange()
                 .expectStatus().isBadRequest();
+    }
+
+    @ParameterizedTest
+    @MethodSource("getSignUpRequests")
+    public void failedUserRegister(SignUpRequest request) {
+        restClient.post()
+                .uri("/customer/register")
+                .body(request)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+
+    private static List<SignUpRequest> getSignUpRequests() {
+        return List.of(
+                new SignUpRequest("x", "password"),
+                new SignUpRequest("name", "password".repeat(50)),
+                new SignUpRequest("y".repeat(100), "password"),
+                new SignUpRequest("&&&&???", "password")
+        );
     }
 
     @Test

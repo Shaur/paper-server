@@ -1,5 +1,6 @@
 package org.home.paper.server.controller;
 
+import jakarta.validation.Valid;
 import org.home.paper.server.dto.JwtAuthenticationResponse;
 import org.home.paper.server.dto.SignInRequest;
 import org.home.paper.server.dto.SignUpRequest;
@@ -25,7 +26,7 @@ public class CustomerController {
     }
 
     @PostMapping("/register")
-    public JwtAuthenticationResponse register(@RequestBody SignUpRequest request) {
+    public JwtAuthenticationResponse register(@Valid @RequestBody SignUpRequest request) {
         return service.singUp(request);
     }
 
