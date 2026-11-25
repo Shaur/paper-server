@@ -36,7 +36,8 @@ interface StorageService {
             val files = dir.resolve(id.toString()).listFiles()
                 ?: throw FileNotFoundException(id, number)
 
-            val file = files.sortedWith(COMPARATOR)[number]
+            val file = files.sortedWith(COMPARATOR).getOrNull(number)
+                ?: throw FileNotFoundException(id, number)
 
             return resolveCache(file, size, id)
         }
@@ -78,7 +79,7 @@ interface StorageService {
             val files = dir.resolve(id.toString()).listFiles()
                 ?: throw FileNotFoundException(id, number)
 
-            val file = files.sortedWith(COMPARATOR)[number] ?: throw FileNotFoundException(id, number)
+            val file = files.sortedWith(COMPARATOR).getOrNull(number) ?: throw FileNotFoundException(id, number)
             file.delete()
 
             val scaleDirs = (cacheDir.listFiles() ?: arrayOf<File>())
