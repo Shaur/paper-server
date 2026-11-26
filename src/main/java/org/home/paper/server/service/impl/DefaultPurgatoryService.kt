@@ -2,17 +2,25 @@ package org.home.paper.server.service.impl
 
 import jakarta.transaction.Transactional
 import org.home.paper.server.dto.ApproveRequest
+import org.home.paper.server.dto.FileUploadedResponse
+import org.home.paper.server.exceptions.IllegalStateException
 import org.home.paper.server.exceptions.ObjectNotFoundException
+import org.home.paper.server.extensions.entity
 import org.home.paper.server.model.ArchiveMeta
 import org.home.paper.server.model.Issue
+import org.home.paper.server.model.Job
 import org.home.paper.server.model.PurgatoryItem
 import org.home.paper.server.model.Series
 import org.home.paper.server.repository.IssueRepository
+import org.home.paper.server.repository.JobRepository
 import org.home.paper.server.repository.PurgatoryRepository
 import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.service.PurgatoryService
 import org.home.paper.server.service.StorageService
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
+import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
 
 @Service
@@ -20,7 +28,8 @@ class DefaultPurgatoryService(
     private val purgatoryRepository: PurgatoryRepository,
     private val issueRepository: IssueRepository,
     private val seriesRepository: SeriesRepository,
-    private val storageService: StorageService
+    private val storageService: StorageService,
+    private val jobRepository: JobRepository
 ) : PurgatoryService {
 
     override fun insert(meta: ArchiveMeta): PurgatoryItem {
@@ -81,5 +90,20 @@ class DefaultPurgatoryService(
         )
 
         purgatoryRepository.update(issueUpdate)
+    }
+
+    override fun uploadFile(file: MultipartFile): FileUploadedResponse {
+        val uuid = UUID.randomUUID().toString()
+        val fileName = file.originalFilename ?: throw IllegalStateException("File name not sent")
+
+        val storedFile = storageService.storePurgatoryArchive(file.inputStream, uuid)
+        val job = Job(
+            fileName = fileName,
+            filePath = storedFile.path,
+            uploadedBy = SecurityContextHolder.getContext().entity().username
+        )
+
+        val savedJob = jobRepository.save(job)
+        return FileUploadedResponse(savedJob.id, savedJob.fileName)
     }
 }

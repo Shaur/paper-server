@@ -36,8 +36,7 @@ public class SecurityConfiguration {
             "/error",
             "/customer/login",
             "/customer/register",
-            "/actuator/health/**",
-            "/actuator/health",
+            "/actuator/health/**"
     };
 
     private final JwtAuthenticationFilter filter;
@@ -63,7 +62,7 @@ public class SecurityConfiguration {
                         requests
                                 // public GET: <img> and coil3 can't send Authorization headers
                                 .requestMatchers(HttpMethod.GET, "/pages/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/private/comics/purgatory/file/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/purgatory/file/**").permitAll()
                                 .requestMatchers(AUTH_WHITELIST).permitAll()
                                 .anyRequest().authenticated()
                 )

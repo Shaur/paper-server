@@ -1,8 +1,10 @@
 package org.home.paper.server.service
 
 import org.home.paper.server.dto.ApproveRequest
+import org.home.paper.server.dto.FileUploadedResponse
 import org.home.paper.server.model.ArchiveMeta
 import org.home.paper.server.model.PurgatoryItem
+import org.springframework.web.multipart.MultipartFile
 
 interface PurgatoryService {
 
@@ -15,5 +17,7 @@ interface PurgatoryService {
     fun approve(request: ApproveRequest)
 
     fun deletePage(id: Long, number: Int)
+
+    fun uploadFile(file: MultipartFile): FileUploadedResponse
 
 }
