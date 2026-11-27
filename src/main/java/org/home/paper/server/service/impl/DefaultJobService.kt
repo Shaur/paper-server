@@ -3,7 +3,6 @@ package org.home.paper.server.service.impl
 import org.home.paper.server.dto.JobView
 import org.home.paper.server.exceptions.IllegalStateException
 import org.home.paper.server.exceptions.ObjectNotFoundException
-import org.home.paper.server.model.Job
 import org.home.paper.server.model.JobStatus
 import org.home.paper.server.repository.JobRepository
 import org.home.paper.server.service.JobService
@@ -42,14 +41,16 @@ class DefaultJobService(
     }
 
     override fun register(): SseEmitter {
-        return streamer.register()
+        val emitter = streamer.register()
+        emitter.send(SseEmitter.event().name("jobs").data(getAll()))
+        return emitter
     }
 
     private var state = EventStreamState()
 
     @Scheduled(fixedRate = 2000)
     fun broadcastEvents() {
-        val views = repository.findAllByOrderByIdDesc().map(Job::toView)
+        val views = getAll()
         if (views == state.lastSent) {
             if (state.incrementAndCheck()) {
                 streamer.ping()
