@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface JobRepository : JpaRepository<Job, Long> {
+
+    fun findAllByOrderByIdDesc(): List<Job>
 }

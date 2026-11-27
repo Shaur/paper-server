@@ -2,7 +2,7 @@ package org.home.paper.server.service.impl
 
 import jakarta.transaction.Transactional
 import org.home.paper.server.dto.ApproveRequest
-import org.home.paper.server.dto.FileUploadedResponse
+import org.home.paper.server.dto.JobView
 import org.home.paper.server.exceptions.IllegalStateException
 import org.home.paper.server.exceptions.ObjectNotFoundException
 import org.home.paper.server.extensions.entity
@@ -17,6 +17,7 @@ import org.home.paper.server.repository.PurgatoryRepository
 import org.home.paper.server.repository.SeriesRepository
 import org.home.paper.server.service.PurgatoryService
 import org.home.paper.server.service.StorageService
+import org.home.paper.server.service.toView
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -92,7 +93,7 @@ class DefaultPurgatoryService(
         purgatoryRepository.update(issueUpdate)
     }
 
-    override fun uploadFile(file: MultipartFile): FileUploadedResponse {
+    override fun uploadFile(file: MultipartFile): JobView {
         val uuid = UUID.randomUUID().toString()
         val fileName = file.originalFilename ?: throw IllegalStateException("File name not sent")
 
@@ -104,6 +105,6 @@ class DefaultPurgatoryService(
         )
 
         val savedJob = jobRepository.save(job)
-        return FileUploadedResponse(savedJob.id, savedJob.fileName)
+        return savedJob.toView()
     }
 }

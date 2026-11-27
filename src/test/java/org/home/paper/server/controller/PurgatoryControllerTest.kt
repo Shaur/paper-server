@@ -2,7 +2,7 @@ package org.home.paper.server.controller
 
 import org.assertj.core.api.Assertions.assertThat
 import org.home.paper.server.Application
-import org.home.paper.server.dto.FileUploadedResponse
+import org.home.paper.server.dto.JobView
 import org.home.paper.server.model.ArchiveMeta
 import org.home.paper.server.model.JobStatus
 import org.home.paper.server.model.PurgatoryItem
@@ -103,7 +103,7 @@ class PurgatoryControllerTest @Autowired constructor(
             .body(body)
             .exchange()
             .expectStatus().isCreated
-            .expectBody<FileUploadedResponse>()
+            .expectBody<JobView>()
             .returnResult()
 
         val result = resultEntity.responseBody

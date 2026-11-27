@@ -1,7 +1,7 @@
 package org.home.paper.server.controller
 
 import org.home.paper.server.dto.ApproveRequest
-import org.home.paper.server.dto.FileUploadedResponse
+import org.home.paper.server.dto.JobView
 import org.home.paper.server.dto.PageSize
 import org.home.paper.server.model.PurgatoryItem
 import org.home.paper.server.service.PurgatoryService
@@ -74,7 +74,7 @@ class PurgatoryController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun uploadFile(@RequestParam("file") file: MultipartFile): FileUploadedResponse {
+    fun uploadFile(@RequestParam("file") file: MultipartFile): JobView {
         return purgatoryService.uploadFile(file)
     }
 }
